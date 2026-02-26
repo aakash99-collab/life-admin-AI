@@ -1,0 +1,3737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Admin AI — Your Personal Life Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — WHITE PREMIUM SAAS
+═══════════════════════════════════════════════ */
+:root {
+  /* Core palette */
+  --white: #ffffff;
+  --bg: #f8fafc;
+  --bg2: #f1f5f9;
+  --navy: #0f172a;
+  --navy2: #1e293b;
+  --navy3: #334155;
+  --navy4: #475569;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+
+  /* Accent */
+  --green: #059669;
+  --green-light: #d1fae5;
+  --green-mid: #6ee7b7;
+  --blue: #2563eb;
+  --blue-light: #dbeafe;
+  --amber: #d97706;
+  --amber-light: #fef3c7;
+  --red: #dc2626;
+  --red-light: #fee2e2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
+  --shadow: 0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-lg: 0 10px 30px rgba(15,23,42,0.12), 0 4px 8px rgba(15,23,42,0.06);
+  --shadow-xl: 0 20px 50px rgba(15,23,42,0.16);
+
+  /* Radius */
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+
+  /* Sidebar */
+  --sidebar: 260px;
+  --topbar-h: 64px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+
+/* ════════════════════════════════
+   SIDEBAR
+════════════════════════════════ */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar);
+  background: var(--navy);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-brand {
+  padding: 0 20px;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand-mark {
+  width: 34px; height: 34px;
+  background: linear-gradient(135deg, #059669, #2563eb);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: white; font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(5,150,105,0.4);
+}
+
+.brand-text { flex: 1; overflow: hidden; }
+.brand-name {
+  font-size: 14px; font-weight: 700; color: white;
+  letter-spacing: -0.3px; white-space: nowrap;
+}
+.brand-sub { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-top: 1px; }
+
+/* Navigation */
+.sidebar-nav { padding: 16px 12px; flex: 1; overflow-y: auto; }
+
+.nav-group-label {
+  font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  padding: 0 8px 8px;
+  margin-top: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  color: rgba(255,255,255,0.55);
+  font-size: 13.5px;
+  font-weight: 500;
+  position: relative;
+  margin-bottom: 2px;
+  user-select: none;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.85);
+}
+.nav-item.active {
+  background: rgba(5,150,105,0.18);
+  color: #6ee7b7;
+}
+.nav-item.active::before {
+  content:'';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 20px;
+  background: #059669;
+  border-radius: 0 3px 3px 0;
+}
+.nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-label { flex: 1; }
+.nav-badge {
+  font-size: 10px; font-weight: 700;
+  background: var(--red); color: white;
+  padding: 1px 6px; border-radius: 20px; min-width: 18px;
+  text-align: center;
+}
+.nav-badge.g { background: var(--green); }
+.nav-badge.a { background: var(--amber); }
+
+/* Sidebar footer */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.lia-online {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: rgba(5,150,105,0.12);
+  border: 1px solid rgba(5,150,105,0.2);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.lia-online:hover { background: rgba(5,150,105,0.2); }
+.lia-pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #059669;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(5,150,105,0.6);
+  animation: pulse-ring 2s infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(5,150,105,0.6); }
+  70% { box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+  100% { box-shadow: 0 0 0 0 rgba(5,150,105,0); }
+}
+.lia-online-text { flex:1; }
+.lia-online-name { font-size: 13px; font-weight: 600; color: #6ee7b7; }
+.lia-online-sub { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* ════════════════════════════════
+   MAIN LAYOUT
+════════════════════════════════ */
+.main {
+  margin-left: var(--sidebar);
+  min-height: 100vh;
+}
+
+/* Topbar */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  height: var(--topbar-h);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+
+.page-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--green);
+  background: var(--green-light);
+  padding: 3px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+
+.page-title {
+  font-size: 18px; font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.4px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.topbar-clock {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--navy4);
+  background: var(--bg2);
+  padding: 6px 12px; border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.icon-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 9px; cursor: pointer;
+  background: white; border: 1px solid var(--border);
+  transition: all 0.18s; font-size: 15px;
+  position: relative;
+}
+.icon-btn:hover { background: var(--bg2); border-color: var(--border2); }
+.icon-btn .badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--red); color: white;
+  font-size: 8px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+}
+
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 12px 4px 4px;
+  background: white; border: 1px solid var(--border);
+  border-radius: 40px; cursor: pointer;
+  transition: all 0.18s;
+}
+.user-chip:hover { border-color: var(--border2); box-shadow: var(--shadow-sm); }
+.user-ava {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: white;
+}
+.user-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+
+/* Page Content */
+.page-content {
+  padding: 28px;
+  max-width: 1440px;
+}
+
+/* ════════════════════════════════
+   VIEW SYSTEM
+════════════════════════════════ */
+.view { display: none; }
+.view.active {
+  display: block;
+  animation: viewIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes viewIn {
+  from { opacity:0; transform: translateY(10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════
+   COMPONENT: CARD
+════════════════════════════════ */
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover { box-shadow: var(--shadow); }
+
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--navy3);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  display: flex; align-items: center; gap: 7px;
+}
+.card-title-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green);
+}
+
+.card-value {
+  font-size: 34px; font-weight: 800;
+  color: var(--navy);
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* ════════════════════════════════
+   COMPONENT: SCORE RING
+════════════════════════════════ */
+.score-ring-container {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 0;
+}
+.score-ring-svg { transform: rotate(-90deg); overflow: visible; }
+.score-ring-bg { fill: none; stroke: var(--bg2); stroke-width: 10; }
+.score-ring-fill {
+  fill: none; stroke-width: 10; stroke-linecap: round;
+  transition: stroke-dasharray 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.score-ring-center {
+  margin-top: 12px; text-align: center;
+}
+.score-number {
+  font-size: 48px; font-weight: 800;
+  letter-spacing: -2px; line-height: 1;
+}
+.score-label { font-size: 12px; color: var(--navy4); margin-top: 4px; }
+
+/* ════════════════════════════════
+   COMPONENT: PROGRESS BAR
+════════════════════════════════ */
+.prog-item { margin-bottom: 14px; }
+.prog-header {
+  display: flex; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.prog-name { font-size: 13px; font-weight: 500; color: var(--navy); }
+.prog-pct { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--navy4); font-weight: 500; }
+.prog-track {
+  height: 7px; background: var(--bg2);
+  border-radius: 4px; overflow: hidden;
+}
+.prog-fill {
+  height: 100%; border-radius: 4px;
+  transition: width 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.prog-fill::after {
+  content:''; position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 6px; background: rgba(255,255,255,0.5);
+  border-radius: 3px;
+  filter: blur(1px);
+}
+.prog-green { background: linear-gradient(90deg, #059669, #10b981); }
+.prog-blue { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.prog-amber { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.prog-red { background: linear-gradient(90deg, #dc2626, #f87171); }
+.prog-purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.prog-navy { background: linear-gradient(90deg, #0f172a, #334155); }
+
+/* ════════════════════════════════
+   COMPONENT: BADGE / TAG
+════════════════════════════════ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+.badge-green { background: var(--green-light); color: var(--green); }
+.badge-red { background: var(--red-light); color: var(--red); }
+.badge-amber { background: var(--amber-light); color: var(--amber); }
+.badge-blue { background: var(--blue-light); color: var(--blue); }
+.badge-purple { background: var(--purple-light); color: var(--purple); }
+.badge-navy { background: var(--bg2); color: var(--navy3); }
+
+/* ════════════════════════════════
+   COMPONENT: ALERT BOX
+════════════════════════════════ */
+.alert {
+  display: flex; gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--r);
+  margin-bottom: 10px;
+}
+.alert:last-child { margin-bottom: 0; }
+.alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.alert-body {}
+.alert-title { font-size: 13.5px; font-weight: 700; margin-bottom: 2px; }
+.alert-desc { font-size: 12.5px; line-height: 1.55; }
+
+.alert-red { background: var(--red-light); border: 1px solid #fca5a5; }
+.alert-red .alert-title { color: var(--red); }
+.alert-red .alert-desc { color: #7f1d1d; }
+
+.alert-amber { background: var(--amber-light); border: 1px solid #fcd34d; }
+.alert-amber .alert-title { color: var(--amber); }
+.alert-amber .alert-desc { color: #78350f; }
+
+.alert-green { background: var(--green-light); border: 1px solid var(--green-mid); }
+.alert-green .alert-title { color: var(--green); }
+.alert-green .alert-desc { color: #064e3b; }
+
+.alert-blue { background: var(--blue-light); border: 1px solid #93c5fd; }
+.alert-blue .alert-title { color: var(--blue); }
+.alert-blue .alert-desc { color: #1e3a8a; }
+
+.alert-navy { background: var(--bg2); border: 1px solid var(--border2); }
+.alert-navy .alert-title { color: var(--navy2); }
+.alert-navy .alert-desc { color: var(--navy4); }
+
+/* ════════════════════════════════
+   COMPONENT: BUTTON
+════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px; border-radius: 9px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--navy);
+  color: white;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.2);
+}
+.btn-primary:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(15,23,42,0.25); }
+
+.btn-green {
+  background: var(--green);
+  color: white;
+  box-shadow: 0 2px 8px rgba(5,150,105,0.3);
+}
+.btn-green:hover { background: #047857; transform: translateY(-1px); }
+
+.btn-blue {
+  background: var(--blue);
+  color: white;
+}
+.btn-blue:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+.btn-outline {
+  background: white;
+  color: var(--navy);
+  border: 1.5px solid var(--border2);
+  box-shadow: var(--shadow-sm);
+}
+.btn-outline:hover { border-color: var(--navy3); background: var(--bg2); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--navy3);
+}
+.btn-ghost:hover { background: var(--bg2); }
+
+.btn-sm { padding: 6px 13px; font-size: 12.5px; }
+.btn-lg { padding: 12px 24px; font-size: 15px; }
+
+.btn-danger {
+  background: var(--red-light);
+  color: var(--red);
+  border: 1px solid #fca5a5;
+}
+.btn-danger:hover { background: #fecaca; }
+
+/* ════════════════════════════════
+   COMPONENT: INPUT
+════════════════════════════════ */
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block;
+  font-size: 12.5px; font-weight: 600;
+  color: var(--navy3);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 13px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
+}
+.form-select { cursor: pointer; }
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-helper { font-size: 11.5px; color: var(--navy4); margin-top: 5px; }
+
+/* ════════════════════════════════
+   COMPONENT: TABLE
+════════════════════════════════ */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-size: 11px; font-weight: 700;
+  color: var(--navy4); text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--border);
+  text-align: left; white-space: nowrap;
+}
+.data-table td {
+  padding: 12px 14px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--border);
+  color: var(--navy);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg); }
+.data-table .mono { font-family: 'DM Mono', monospace; font-size: 12.5px; }
+
+/* ════════════════════════════════
+   COMPONENT: TASK ITEM
+════════════════════════════════ */
+.task-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 8px;
+  transition: all 0.18s;
+  cursor: pointer;
+}
+.task-row:hover { border-color: var(--border2); box-shadow: var(--shadow-sm); }
+.task-row.done { opacity: 0.55; }
+
+.task-check {
+  width: 18px; height: 18px; min-width: 18px;
+  border: 2px solid var(--border2);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  transition: all 0.18s; cursor: pointer; margin-top: 1px;
+  background: white;
+}
+.task-check.checked { background: var(--green); border-color: var(--green); color: white; }
+
+.task-body { flex: 1; }
+.task-title { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+.task-title.strikethrough { text-decoration: line-through; color: var(--navy4); }
+.task-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.task-due { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--navy4); }
+.task-due.red { color: var(--red); font-weight: 600; }
+
+/* ════════════════════════════════
+   COMPONENT: BILL ITEM
+════════════════════════════════ */
+.bill-item {
+  display: flex; align-items: center;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 8px;
+  transition: all 0.18s;
+  background: white;
+}
+.bill-item:hover { border-color: var(--border2); box-shadow: var(--shadow-sm); }
+.bill-icon-wrap {
+  width: 42px; height: 42px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; margin-right: 14px;
+}
+.bill-info { flex: 1; }
+.bill-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.bill-details { font-size: 12px; color: var(--navy4); }
+.bill-right { text-align: right; }
+.bill-amount { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 600; color: var(--navy); }
+.bill-status-text { font-size: 11px; margin-top: 2px; }
+
+/* ════════════════════════════════
+   COMPONENT: MODAL
+════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.overlay.open { display: flex; animation: overlayIn 0.2s ease; }
+@keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+
+.modal {
+  background: white;
+  border-radius: var(--r-xl);
+  width: 100%; max-width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-xl);
+  animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalIn {
+  from { opacity:0; transform: scale(0.96) translateY(8px); }
+  to { opacity:1; transform: scale(1) translateY(0); }
+}
+.modal-lg { max-width: 680px; }
+
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 24px 0;
+}
+.modal-title { font-size: 18px; font-weight: 800; color: var(--navy); letter-spacing: -0.4px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; color: var(--navy3);
+  transition: all 0.18s;
+}
+.modal-close:hover { background: var(--red-light); color: var(--red); }
+.modal-body { padding: 20px 24px 24px; }
+
+/* ════════════════════════════════
+   COMPONENT: AI INSIGHT BOX
+════════════════════════════════ */
+.lia-box {
+  background: linear-gradient(135deg, #f0fdf4, #eff6ff);
+  border: 1px solid #86efac;
+  border-radius: var(--r-lg);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.lia-box::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle, rgba(5,150,105,0.08), transparent 70%);
+  pointer-events: none;
+}
+.lia-box-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+}
+.lia-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green); color: white;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.lia-box-time { font-size: 11px; color: var(--navy4); margin-left: auto; }
+.lia-box-text {
+  font-size: 13.5px; color: var(--navy2);
+  line-height: 1.72;
+}
+.lia-box-text strong { color: var(--navy); }
+.lia-box-text em { color: var(--green); font-style: normal; font-weight: 600; }
+
+/* ════════════════════════════════
+   COMPONENT: STAT TILE
+════════════════════════════════ */
+.stat-tile {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+.stat-tile:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.stat-tile-accent {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-label { font-size: 12px; font-weight: 600; color: var(--navy4); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.stat-value { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 6px; color: var(--navy); }
+.stat-sub { font-size: 12px; color: var(--navy4); display: flex; align-items: center; gap: 4px; }
+.stat-sub.up { color: var(--green); }
+.stat-sub.down { color: var(--red); }
+
+/* ════════════════════════════════
+   COMPONENT: CHART BARS
+════════════════════════════════ */
+.bar-chart {
+  display: flex; align-items: flex-end;
+  gap: 8px; padding: 0 4px;
+}
+.bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.bar-pair { display: flex; gap: 3px; align-items: flex-end; width: 100%; }
+.bar-fill {
+  border-radius: 4px 4px 0 0; min-height: 4px;
+  transition: height 1s cubic-bezier(0.16,1,0.3,1);
+}
+.bar-lbl { font-size: 10px; color: var(--navy4); font-family: 'DM Mono', monospace; }
+
+/* ════════════════════════════════
+   COMPONENT: LIA CHAT
+════════════════════════════════ */
+.chat-fab {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  z-index: 120;
+}
+.chat-fab-btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #2563eb);
+  box-shadow: 0 6px 24px rgba(5,150,105,0.45);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none;
+  transition: all 0.25s;
+  color: white; font-size: 22px;
+}
+.chat-fab-btn:hover { transform: scale(1.08); box-shadow: 0 10px 32px rgba(5,150,105,0.55); }
+
+.chat-window {
+  position: fixed;
+  bottom: 96px; right: 28px;
+  width: 380px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-xl);
+  z-index: 120;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+}
+.chat-window.open { display: flex; animation: chatIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+@keyframes chatIn {
+  from { opacity:0; transform: scale(0.95) translateY(10px); }
+  to { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.chat-header {
+  padding: 16px 18px;
+  background: var(--navy);
+  display: flex; align-items: center; gap: 12px;
+}
+.chat-ava {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #10b981);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: white;
+  flex-shrink: 0;
+}
+.chat-header-info { flex: 1; }
+.chat-header-name { font-size: 14px; font-weight: 700; color: white; }
+.chat-header-status { font-size: 11px; color: #6ee7b7; display: flex; align-items: center; gap: 4px; }
+.chat-close { color: rgba(255,255,255,0.5); cursor: pointer; font-size: 20px; line-height: 1; transition: color 0.15s; }
+.chat-close:hover { color: white; }
+
+.chat-msgs {
+  flex: 1; padding: 16px;
+  overflow-y: auto; display: flex;
+  flex-direction: column; gap: 12px;
+  min-height: 260px; max-height: 360px;
+}
+
+.msg { display: flex; gap: 8px; animation: msgIn 0.2s ease; }
+.msg.user { flex-direction: row-reverse; }
+@keyframes msgIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: translateY(0); } }
+
+.msg-ava {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #059669, #10b981);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+
+.msg-bubble {
+  padding: 10px 13px;
+  border-radius: 13px;
+  font-size: 13px; line-height: 1.55;
+  max-width: 82%;
+}
+.msg.lia .msg-bubble {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--navy); border-bottom-left-radius: 4px;
+}
+.msg.user .msg-bubble {
+  background: var(--navy);
+  color: white; border-bottom-right-radius: 4px;
+}
+
+.chat-input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px;
+}
+.chat-input {
+  flex: 1; background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: 9px; padding: 9px 13px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px; color: var(--navy); outline: none;
+  transition: border-color 0.18s;
+}
+.chat-input:focus { border-color: var(--green); background: white; }
+.chat-send {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--navy); color: white; border: none;
+  cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s; flex-shrink: 0;
+}
+.chat-send:hover { background: var(--green); transform: scale(1.05); }
+
+/* Typing indicator */
+.typing-dots { display: inline-flex; gap: 4px; align-items: center; padding: 4px 2px; }
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--navy3); opacity: 0.4;
+  animation: tdot 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot { 0%,80%,100%{opacity:.4;transform:scale(1)}40%{opacity:1;transform:scale(1.3)} }
+
+/* ════════════════════════════════
+   NOTIFICATION PANEL
+════════════════════════════════ */
+.notif-panel {
+  position: fixed; top: 72px; right: 20px;
+  width: 360px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-xl);
+  z-index: 150;
+  display: none;
+  overflow: hidden;
+}
+.notif-panel.open { display: block; animation: viewIn 0.2s ease; }
+.notif-panel-header {
+  padding: 16px 18px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.notif-panel-title { font-size: 15px; font-weight: 700; color: var(--navy); }
+.notif-panel-close { font-size: 13px; color: var(--navy4); cursor: pointer; }
+.notif-panel-close:hover { color: var(--navy); }
+.notif-list { max-height: 400px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--bg); }
+.notif-item-icon { font-size: 18px; flex-shrink: 0; }
+.notif-item-content {}
+.notif-item-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+.notif-item-desc { font-size: 12px; color: var(--navy4); line-height: 1.45; }
+.notif-item-time { font-size: 10.5px; color: var(--navy4); margin-top: 4px; font-family: 'DM Mono', monospace; }
+
+/* ════════════════════════════════
+   GRID UTILITIES
+════════════════════════════════ */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+.g12 { display: grid; grid-template-columns: 1fr 2fr; gap: 18px; }
+.g21 { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; }
+.g13 { display: grid; grid-template-columns: 1fr 3fr; gap: 18px; }
+.mb8 { margin-bottom: 8px; }
+.mb12 { margin-bottom: 12px; }
+.mb16 { margin-bottom: 16px; }
+.mb20 { margin-bottom: 20px; }
+.mb24 { margin-bottom: 24px; }
+.gap8 { display:flex; gap:8px; }
+.gap12 { display:flex; gap:12px; }
+.flex-between { display:flex; justify-content:space-between; align-items:center; }
+.flex-center { display:flex; align-items:center; }
+.flex-wrap { flex-wrap: wrap; }
+.divider { height:1px; background: var(--border); margin: 18px 0; }
+.text-sm { font-size: 12.5px; }
+.text-muted { color: var(--navy4); }
+.text-navy { color: var(--navy); }
+.font-mono { font-family: 'DM Mono', monospace; }
+.font-bold { font-weight: 700; }
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.text-amber { color: var(--amber); }
+
+/* ════════════════════════════════
+   SECTION HEADER
+════════════════════════════════ */
+.section-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 24px; font-weight: 800;
+  color: var(--navy); letter-spacing: -0.6px;
+}
+.section-sub { font-size: 13.5px; color: var(--navy4); margin-top: 4px; }
+
+/* ════════════════════════════════
+   DASHBOARD HERO
+════════════════════════════════ */
+.dash-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #1e3a8a 100%);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.dash-hero::before {
+  content:'';
+  position: absolute; top: 0; right: 0;
+  width: 300px; height: 100%;
+  background: url("data:image/svg+xml,%3Csvg width='300' height='160' viewBox='0 0 300 160' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='240' cy='80' r='120' fill='white' fill-opacity='0.03'/%3E%3Ccircle cx='280' cy='40' r='60' fill='white' fill-opacity='0.04'/%3E%3C/svg%3E") no-repeat center/cover;
+  pointer-events: none;
+}
+.dash-hero-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 22px;
+}
+.dash-hero-left {}
+.dash-greeting { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+.dash-name { font-size: 26px; font-weight: 800; letter-spacing: -0.6px; }
+.dash-date { font-size: 12.5px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+.dash-score-area { display: flex; align-items: center; gap: 20px; }
+.dash-life-score {}
+.dash-life-score-val {
+  font-size: 60px; font-weight: 800;
+  letter-spacing: -3px; line-height: 1;
+  color: white;
+}
+.dash-life-score-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.6px; }
+
+.risk-pill {
+  padding: 8px 16px; border-radius: 20px;
+  font-size: 12.5px; font-weight: 700;
+  border: 1.5px solid;
+}
+.risk-low { background: rgba(5,150,105,0.15); color: #6ee7b7; border-color: rgba(5,150,105,0.3); }
+.risk-moderate { background: rgba(217,119,6,0.15); color: #fcd34d; border-color: rgba(217,119,6,0.3); }
+.risk-high { background: rgba(220,38,38,0.15); color: #fca5a5; border-color: rgba(220,38,38,0.3); }
+
+.dash-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.dash-action-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all 0.18s; font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.dash-action-primary {
+  background: #059669; color: white;
+  box-shadow: 0 4px 14px rgba(5,150,105,0.35);
+}
+.dash-action-primary:hover { background: #047857; transform: translateY(-1px); }
+.dash-action-secondary {
+  background: rgba(255,255,255,0.1);
+  color: white; backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.dash-action-secondary:hover { background: rgba(255,255,255,0.18); }
+
+/* ════════════════════════════════
+   RADAR CHART
+════════════════════════════════ */
+.radar-container {
+  display: flex; align-items: center; justify-content: center;
+  padding: 10px;
+}
+.radar-svg { overflow: visible; }
+.radar-area {
+  fill: rgba(5,150,105,0.15);
+  stroke: var(--green);
+  stroke-width: 2;
+  transition: all 1s cubic-bezier(0.16,1,0.3,1);
+}
+.radar-bg-line { stroke: var(--border); stroke-width: 1; fill: none; }
+.radar-spoke { stroke: var(--border); stroke-width: 1; }
+.radar-label { font-size: 11px; font-weight: 600; fill: var(--navy4); font-family: 'Plus Jakarta Sans', sans-serif; }
+.radar-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.radar-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.radar-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ════════════════════════════════
+   PROJECTION CHART
+════════════════════════════════ */
+.projection-area {
+  background: linear-gradient(135deg, var(--bg), #eff6ff);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  border: 1px solid var(--blue-light);
+}
+
+/* ════════════════════════════════
+   BURNOUT METER
+════════════════════════════════ */
+.burnout-meter {
+  position: relative;
+  width: 100%; height: 180px;
+  display: flex; align-items: center; justify-content: center;
+}
+.burnout-svg { overflow: visible; }
+
+/* ════════════════════════════════
+   DECISION SIMULATOR RESULT
+════════════════════════════════ */
+.sim-result {
+  background: linear-gradient(135deg, #f0fdf4, #eff6ff);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  border: 1px solid var(--border);
+  margin-top: 16px;
+  display: none;
+}
+.sim-result.show { display: block; animation: viewIn 0.3s ease; }
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 1024px) {
+  :root { --sidebar: 68px; }
+  .nav-label, .nav-group-label, .brand-text, .lia-online-text { display: none; }
+  .brand-mark { margin: auto; }
+  .nav-item { justify-content: center; padding: 11px; }
+  .nav-item.active::before { display: none; }
+  .nav-item .nav-icon { font-size: 18px; }
+  .sidebar-brand { justify-content: center; }
+  .nav-badge { display: none; }
+  .lia-online { justify-content: center; }
+  .lia-pulse { margin: auto; }
+  .g3, .g4 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  :root { --sidebar: 0px; }
+  .sidebar { display: none; }
+  .g2, .g3, .g4, .g12, .g21 { grid-template-columns: 1fr; }
+  .page-content { padding: 16px; }
+  .dash-hero { padding: 20px; }
+  .dash-life-score-val { font-size: 44px; }
+}
+
+/* Staggered animations */
+.stagger > * {
+  animation: viewIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.16s; }
+.stagger > *:nth-child(5) { animation-delay: 0.20s; }
+.stagger > *:nth-child(6) { animation-delay: 0.24s; }
+
+/* Animated number counter */
+.counter { transition: none; }
+
+/* Spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(5,150,105,0.2);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+/* Shimmer placeholder */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--bg2) 25%, var(--border) 50%, var(--bg2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* File drop zone */
+.drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--r-lg);
+  padding: 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg);
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--green);
+  background: var(--green-light);
+}
+
+/* Roadmap */
+.roadmap { display: flex; flex-direction: column; }
+.roadmap-step { display: flex; gap: 14px; }
+.roadmap-track { display: flex; flex-direction: column; align-items: center; }
+.roadmap-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.roadmap-dot.done { background: var(--green); box-shadow: 0 0 0 3px var(--green-light); }
+.roadmap-dot.active { background: var(--blue); box-shadow: 0 0 0 3px var(--blue-light); }
+.roadmap-dot.pending { background: var(--border2); }
+.roadmap-connector { width: 2px; flex: 1; background: var(--border); min-height: 16px; margin: 3px 0; }
+.roadmap-content { flex: 1; padding-bottom: 16px; }
+.roadmap-step-title { font-size: 13.5px; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+.roadmap-step-desc { font-size: 12px; color: var(--navy4); line-height: 1.45; }
+.roadmap-step-time { font-size: 11px; color: var(--navy4); margin-top: 4px; font-family: 'DM Mono', monospace; }
+
+/* Quick insight chip */
+.quick-insight-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: white; border: 1px solid var(--border);
+  padding: 8px 14px; border-radius: 20px;
+  font-size: 12.5px; font-weight: 500; color: var(--navy3);
+  cursor: pointer; transition: all 0.18s;
+  white-space: nowrap;
+}
+.quick-insight-chip:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+/* Meter gauge */
+.gauge-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.gauge-label {
+  position: absolute;
+  text-align: center;
+  bottom: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-mark">LA</div>
+    <div class="brand-text">
+      <div class="brand-name">Life Admin AI</div>
+      <div class="brand-sub">Life Operating System</div>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <div class="nav-group-label">Command</div>
+    <div class="nav-item active" onclick="goTo('dashboard',this)" title="Dashboard">
+      <span class="nav-icon">⊞</span>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="goTo('lifescore',this)" title="Life Score">
+      <span class="nav-icon">★</span>
+      <span class="nav-label">Life Score</span>
+      <span class="nav-badge g">74</span>
+    </div>
+    <div class="nav-item" onclick="goTo('radar',this)" title="Life Balance">
+      <span class="nav-icon">◎</span>
+      <span class="nav-label">Life Balance Radar</span>
+    </div>
+
+    <div class="nav-group-label">Planning</div>
+    <div class="nav-item" onclick="goTo('tasks',this)" title="Tasks">
+      <span class="nav-icon">✓</span>
+      <span class="nav-label">Task & Deadline Engine</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="goTo('goals',this)" title="Goals">
+      <span class="nav-icon">⬡</span>
+      <span class="nav-label">Goal Decomposition</span>
+    </div>
+    <div class="nav-item" onclick="goTo('burnout',this)" title="Burnout">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Burnout Predictor</span>
+      <span class="nav-badge a">!</span>
+    </div>
+
+    <div class="nav-group-label">Finance</div>
+    <div class="nav-item" onclick="goTo('finance',this)" title="Finance">
+      <span class="nav-icon">◈</span>
+      <span class="nav-label">Financial Intelligence</span>
+    </div>
+    <div class="nav-item" onclick="goTo('emi',this)" title="EMI">
+      <span class="nav-icon">⋄</span>
+      <span class="nav-label">EMI Manager</span>
+    </div>
+    <div class="nav-item" onclick="goTo('simulator',this)" title="Simulator">
+      <span class="nav-icon">⚙</span>
+      <span class="nav-label">Decision Simulator</span>
+    </div>
+
+    <div class="nav-group-label">Intelligence</div>
+    <div class="nav-item" onclick="goTo('projection',this)" title="Projection">
+      <span class="nav-icon">↗</span>
+      <span class="nav-label">Future Projection</span>
+    </div>
+    <div class="nav-item" onclick="goTo('documents',this)" title="Documents">
+      <span class="nav-icon">▦</span>
+      <span class="nav-label">Document Vault</span>
+      <span class="nav-badge">2</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="lia-online" onclick="toggleChat()" title="Chat with LIA">
+      <div class="lia-pulse"></div>
+      <div class="lia-online-text">
+        <div class="lia-online-name">LIA — Online</div>
+        <div class="lia-online-sub">Ask me anything</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════ -->
+<div class="main">
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="page-label" id="pageBadge">Dashboard</div>
+    <div class="page-title" id="pageTitle">Life Command Center</div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-clock" id="liveClock">00:00:00</div>
+    <div class="icon-btn" onclick="toggleNotif()" title="Notifications">
+      🔔
+      <span class="badge">4</span>
+    </div>
+    <div class="user-chip">
+      <div class="user-ava">AK</div>
+      <span class="user-name">Aditya Kumar</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ALL VIEWS
+══════════════════════════════════════════ -->
+<div class="page-content">
+
+<!-- ═══════════════════════
+     DASHBOARD
+═══════════════════════ -->
+<div class="view active" id="view-dashboard">
+
+  <!-- Hero Card -->
+  <div class="dash-hero">
+    <div class="dash-hero-top">
+      <div class="dash-hero-left">
+        <div class="dash-greeting">Good <span id="timeOfDay">morning</span>, welcome back</div>
+        <div class="dash-name">Aditya Kumar</div>
+        <div class="dash-date" id="fullDate">Loading date…</div>
+      </div>
+      <div class="dash-score-area">
+        <div class="dash-life-score">
+          <div class="dash-life-score-val" id="heroScore">74</div>
+          <div class="dash-life-score-label">Life Score / 100</div>
+        </div>
+        <div>
+          <div class="risk-pill risk-moderate" id="riskPill">⚠ Moderate Risk</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;margin-top:6px;">Financial + Career</div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-actions">
+      <button class="dash-action-btn dash-action-primary" onclick="runFocusBriefing()">
+        🎯 What Should I Focus On Today?
+      </button>
+      <button class="dash-action-btn dash-action-secondary" onclick="runFullAnalysis()">
+        🔍 Run Full Life Analysis
+      </button>
+      <button class="dash-action-btn dash-action-secondary" onclick="goTo('simulator',null)">
+        ⚙ Decision Simulator
+      </button>
+    </div>
+  </div>
+
+  <!-- LIA Daily Briefing -->
+  <div class="lia-box mb20" id="dashBriefing">
+    <div class="lia-box-header">
+      <div class="lia-chip">⚡ LIA Intelligence Briefing</div>
+      <span class="lia-box-time" id="briefingTime">Analyzing…</span>
+    </div>
+    <div class="lia-box-text" id="dashBriefingText">
+      <span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>
+    </div>
+  </div>
+
+  <!-- Stat Tiles -->
+  <div class="g4 mb20 stagger" id="statTiles">
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:linear-gradient(90deg,#059669,#10b981)"></div>
+      <div class="stat-label">Financial Health</div>
+      <div class="stat-value text-green" id="st-fin">68</div>
+      <div class="stat-sub down">↓ -3 vs last month</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:linear-gradient(90deg,#d97706,#fbbf24)"></div>
+      <div class="stat-label">Burnout Risk</div>
+      <div class="stat-value text-amber" id="st-burn">42%</div>
+      <div class="stat-sub" style="color:var(--amber)">⚠ Moderate pressure</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:linear-gradient(90deg,#2563eb,#60a5fa)"></div>
+      <div class="stat-label">Goal Completion</div>
+      <div class="stat-value" style="color:var(--blue)" id="st-goal">61%</div>
+      <div class="stat-sub up">↑ +8% this quarter</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:linear-gradient(90deg,#7c3aed,#a78bfa)"></div>
+      <div class="stat-label">Monthly Savings</div>
+      <div class="stat-value" style="color:var(--purple)">₹17.6K</div>
+      <div class="stat-sub down">↓ 20.7% savings rate</div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <div class="g21 mb20">
+    <!-- Priority Tasks -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Critical Priorities Today</div>
+        <button class="btn btn-outline btn-sm" onclick="goTo('tasks',null)">All Tasks →</button>
+      </div>
+      <div id="dashTaskList">
+        <!-- Tasks rendered by JS -->
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;" id="quickChips">
+        <div class="quick-insight-chip" onclick="addTaskQuick()">+ Add Task</div>
+        <div class="quick-insight-chip" onclick="generateDailyPlan()">📋 Daily Plan</div>
+        <div class="quick-insight-chip" onclick="goTo('burnout',null)">⚡ Burnout Check</div>
+      </div>
+    </div>
+    <!-- Right Column -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <!-- EMI Due -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>EMI & Bills Due</div>
+          <button class="btn btn-ghost btn-sm" onclick="goTo('emi',null)">→</button>
+        </div>
+        <div id="dashEmiList"></div>
+      </div>
+      <!-- Doc Expiry -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Document Expiry Alerts</div>
+        </div>
+        <div class="alert alert-red mb8">
+          <div class="alert-icon">🚨</div>
+          <div class="alert-body"><div class="alert-title">Health Insurance</div><div class="alert-desc">Expires in 18 days — renew immediately to avoid lapse in coverage.</div></div>
+        </div>
+        <div class="alert alert-amber">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-body"><div class="alert-title">Vehicle Insurance</div><div class="alert-desc">Expires June 20 — 4 months to renewal.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Row: Finance Snapshot + AI Weekly Summary -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Financial Snapshot</div>
+        <button class="btn btn-ghost btn-sm" onclick="goTo('finance',null)">Full View →</button>
+      </div>
+      <div id="finSnapshot"></div>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,var(--navy),#1e3a8a);color:white;border-color:transparent;">
+      <div class="card-header">
+        <div class="card-title" style="color:rgba(255,255,255,0.6)"><div class="card-title-dot" style="background:#6ee7b7"></div>AI Weekly Strategic Summary</div>
+        <div class="lia-chip" style="font-size:10px">LIA</div>
+      </div>
+      <div id="weeklyAISummary" style="color:rgba(255,255,255,0.85);font-size:13px;line-height:1.7;">
+        <span class="typing-dots"><span class="typing-dot" style="background:white"></span><span class="typing-dot" style="background:white"></span><span class="typing-dot" style="background:white"></span></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     LIFE SCORE
+═══════════════════════ -->
+<div class="view" id="view-lifescore">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Life Score Engine</div>
+      <div class="section-sub">Your comprehensive life organization index — dynamically calculated from all modules</div>
+    </div>
+    <button class="btn btn-primary" onclick="analyzeLifeScore()">🤖 Full AI Analysis</button>
+  </div>
+
+  <div class="g12 mb20">
+    <!-- Score Ring -->
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;">
+      <div style="font-size:12px;color:var(--navy4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:16px;">Overall Life Score</div>
+      <svg class="score-ring-svg" width="180" height="180" viewBox="0 0 180 180">
+        <circle class="score-ring-bg" cx="90" cy="90" r="76"/>
+        <circle class="score-ring-fill" id="lifeScoreArc" cx="90" cy="90" r="76"
+          stroke="url(#lsGrad)" stroke-dasharray="0 478"
+          style="transition:stroke-dasharray 2s cubic-bezier(0.16,1,0.3,1)"/>
+        <defs>
+          <linearGradient id="lsGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#059669"/>
+            <stop offset="100%" stop-color="#2563eb"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div style="margin-top:-96px;text-align:center;position:relative;z-index:1;pointer-events:none;margin-bottom:60px;">
+        <div style="font-size:60px;font-weight:800;letter-spacing:-3px;line-height:1;background:linear-gradient(135deg,#059669,#2563eb);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">74</div>
+        <div style="font-size:12px;color:var(--navy4)">out of 100</div>
+      </div>
+      <div class="badge badge-amber" style="font-size:12px;padding:5px 14px;">Good — Room to Improve</div>
+      <div style="font-size:12.5px;color:var(--navy4);text-align:center;margin-top:12px;line-height:1.6;">Prioritizing financial discipline and document management could push your score to <strong>85+</strong> within 30 days.</div>
+    </div>
+
+    <!-- Breakdown -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Score Components</div>
+        <button class="btn btn-outline btn-sm" onclick="analyzeLifeScore()">AI Insights</button>
+      </div>
+      <div id="scoreBreakdown"></div>
+      <div class="divider"></div>
+      <div class="lia-box">
+        <div class="lia-box-header"><div class="lia-chip">LIA Diagnosis</div></div>
+        <div class="lia-box-text" id="liaDiagnosis">Your score of <strong>74/100</strong> is being held back primarily by two factors: <em>financial overspend (34% above budget)</em> and <em>incomplete document organization (6 missing files)</em>. Addressing these two areas alone would yield a +9 point improvement. Goal completion is your strongest dimension — maintain this momentum.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Improvement Roadmap -->
+  <div class="card mb20">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>30-Day Score Improvement Plan</div>
+    </div>
+    <div class="g3">
+      <div class="alert alert-red">
+        <div class="alert-icon">🚨</div>
+        <div class="alert-body"><div class="alert-title">Act Now (+8 pts)</div><div class="alert-desc">Renew health insurance · Upload 6 missing docs · Pay overdue electricity bill · Set up SIP for emergency fund</div></div>
+      </div>
+      <div class="alert alert-amber">
+        <div class="alert-icon">⚡</div>
+        <div class="alert-body"><div class="alert-title">This Month (+5 pts)</div><div class="alert-desc">Cut food/dining by ₹4,400 · Complete AWS Module 4+5 · Reduce variable spending to under budget</div></div>
+      </div>
+      <div class="alert alert-blue">
+        <div class="alert-icon">🎯</div>
+        <div class="alert-body"><div class="alert-title">90-Day Horizon (+12 pts)</div><div class="alert-desc">Close personal loan early · Emergency fund 60% funded · Submit 3 job applications with new cert</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot"></div>Score History (6 Months)</div>
+    </div>
+    <div style="height:100px;" id="scoreHistChart"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     LIFE BALANCE RADAR
+═══════════════════════ -->
+<div class="view" id="view-radar">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Life Balance Radar</div>
+      <div class="section-sub">6-dimensional analysis of your life equilibrium</div>
+    </div>
+    <button class="btn btn-primary" onclick="analyzeRadar()">🤖 Explain Imbalance</button>
+  </div>
+
+  <div class="g21 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Balance Assessment</div>
+      </div>
+      <div class="radar-container">
+        <svg class="radar-svg" width="300" height="300" id="radarSVG"></svg>
+      </div>
+      <div class="radar-legend" id="radarLegend"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot"></div>Dimension Scores</div>
+        </div>
+        <div id="radarBars"></div>
+      </div>
+      <div class="card" style="background:var(--navy);border-color:transparent;">
+        <div class="card-header">
+          <div class="card-title" style="color:rgba(255,255,255,0.5)"><div class="card-title-dot" style="background:#6ee7b7"></div>LIA Balance Analysis</div>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.72;" id="radarInsight">
+          <span class="typing-dots"><span class="typing-dot" style="background:white"></span><span class="typing-dot" style="background:white"></span><span class="typing-dot" style="background:white"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>What's Causing the Imbalance?</div>
+    </div>
+    <div class="g3">
+      <div class="alert alert-red"><div class="alert-icon">📉</div><div class="alert-body"><div class="alert-title">Finance — 68/100</div><div class="alert-desc">Debt-to-income at 33.5% (exceeds 30% threshold). Overspending in food & lifestyle categories. Emergency fund coverage only 2.3 months.</div></div></div>
+      <div class="alert alert-amber"><div class="alert-icon">🏢</div><div class="alert-body"><div class="alert-title">Career — 65/100</div><div class="alert-desc">AWS certification 40% complete — at risk of missing April deadline. No new certifications in 14 months. Skills gap in cloud architecture.</div></div></div>
+      <div class="alert alert-green"><div class="alert-icon">✅</div><div class="alert-body"><div class="alert-title">Personal Growth — 82/100</div><div class="alert-desc">Strong fitness goal momentum (55% complete). Reading habit consistent. AWS study is progressing but slower than optimal.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     TASKS & DEADLINES
+═══════════════════════ -->
+<div class="view" id="view-tasks">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Task & Deadline Strategy Engine</div>
+      <div class="section-sub">AI-prioritized task management with burnout detection</div>
+    </div>
+    <div class="gap8">
+      <button class="btn btn-outline btn-sm" onclick="generateDailyPlan()">📋 AI Daily Plan</button>
+      <button class="btn btn-primary" onclick="openTaskModal()">+ Add Task</button>
+    </div>
+  </div>
+
+  <div class="g21 mb20">
+    <div>
+      <div class="lia-box mb16" id="taskAIBox">
+        <div class="lia-box-header"><div class="lia-chip">📋 LIA Daily Execution Plan</div></div>
+        <div class="lia-box-text" id="dailyPlanText">Click <strong>"AI Daily Plan"</strong> to get your personalized, time-blocked agenda for today based on task urgency, energy levels, and deadline pressure.</div>
+      </div>
+
+      <div class="card mb16">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Critical — Act Today</div>
+          <span class="badge badge-red" id="criticalCount">2</span>
+        </div>
+        <div id="tasks-critical"></div>
+      </div>
+
+      <div class="card mb16">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>Strategic — This Week</div>
+          <span class="badge badge-amber" id="strategicCount">3</span>
+        </div>
+        <div id="tasks-strategic"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot"></div>Routine — When Possible</div>
+        </div>
+        <div id="tasks-routine"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <!-- Calendar -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>Calendar View</div>
+        </div>
+        <div id="miniCal"></div>
+      </div>
+
+      <!-- Quick Add -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot"></div>Quick Add</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Task Name</label>
+          <input class="form-input" id="qt-name" placeholder="e.g. Pay electricity bill">
+        </div>
+        <div class="g2">
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input class="form-input" type="date" id="qt-date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <select class="form-select" id="qt-prio">
+              <option value="ai">🤖 AI Decide</option>
+              <option value="critical">🔴 Critical</option>
+              <option value="strategic">🟡 Strategic</option>
+              <option value="routine">🟢 Routine</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="addQuickTask()">Add Task</button>
+      </div>
+
+      <!-- Overload Alert -->
+      <div class="card" style="background:var(--amber-light);border-color:#fcd34d;">
+        <div class="card-header">
+          <div class="card-title" style="color:var(--amber)"><div class="card-title-dot" style="background:var(--amber)"></div>Overload Density Alert</div>
+        </div>
+        <div style="font-size:13px;color:#78350f;line-height:1.65;">
+          <strong>5 tasks due this week</strong> — approaching high-density threshold. LIA detects a <strong>42% burnout probability</strong> if all tasks are attempted without prioritization. Consider deferring 2 routine items to next week.
+        </div>
+        <button class="btn btn-sm" style="margin-top:10px;background:var(--amber);color:white;border:none;cursor:pointer;" onclick="goTo('burnout',null)">View Burnout Analysis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     GOAL DECOMPOSITION
+═══════════════════════ -->
+<div class="view" id="view-goals">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Goal Decomposition Engine</div>
+      <div class="section-sub">Set goals. LIA builds the execution roadmap.</div>
+    </div>
+    <button class="btn btn-primary" onclick="openGoalModal()">+ New Goal</button>
+  </div>
+
+  <!-- Goal Input / AI Analysis -->
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Define Your Goal</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Goal Statement</label>
+        <input class="form-input" id="goal-input" placeholder="e.g. Get a Senior Software Engineering job in 1 year" value="Become a Senior Cloud/Data Engineer">
+      </div>
+      <div class="g2">
+        <div class="form-group">
+          <label class="form-label">Target Date</label>
+          <input class="form-input" type="date" id="goal-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="goal-cat">
+            <option>Career</option>
+            <option>Financial</option>
+            <option>Health</option>
+            <option>Learning</option>
+            <option>Personal</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Current Status & Resources</label>
+        <textarea class="form-textarea" id="goal-context" placeholder="Your current skills, time available, constraints…">Software Engineer 3yr exp, Python/Django/SQL, 8hr/week available, ₹5K learning budget</textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="decomposeGoal()">🤖 AI Decompose & Build Roadmap</button>
+    </div>
+
+    <div class="card" id="goalDecompBox">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Active Goals — Progress</div>
+      </div>
+      <div id="goalsList"></div>
+    </div>
+  </div>
+
+  <!-- Roadmap Output -->
+  <div class="card" id="goalRoadmapCard" style="display:none;">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>AI-Generated 6-Month Roadmap</div>
+      <div class="badge badge-blue" id="successProb">78% Success Probability</div>
+    </div>
+    <div class="g3" id="roadmapPhases"></div>
+    <div class="divider"></div>
+    <div class="lia-box mt12" id="goalAIInsight" style="margin-top:0">
+      <div class="lia-box-header"><div class="lia-chip">LIA Strategic Assessment</div></div>
+      <div class="lia-box-text" id="goalInsightText">Generating…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     BURNOUT PREDICTOR
+═══════════════════════ -->
+<div class="view" id="view-burnout">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Burnout & Overload Predictor</div>
+      <div class="section-sub">Multi-factor analysis: task density + financial stress + goal pressure</div>
+    </div>
+    <button class="btn btn-primary" onclick="analyzeBurnout()">🤖 Run Analysis</button>
+  </div>
+
+  <div class="g2 mb20">
+    <!-- Gauge -->
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:32px;">
+      <div style="font-size:12px;color:var(--navy4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:20px;">Burnout Probability</div>
+
+      <div style="position:relative;width:200px;height:120px;margin-bottom:16px;">
+        <svg width="200" height="120" viewBox="0 0 200 120">
+          <!-- Background arc -->
+          <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#e2e8f0" stroke-width="16" stroke-linecap="round"/>
+          <!-- Color gradient sections -->
+          <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round" opacity="0.2"/>
+          <!-- Animated fill arc -->
+          <path id="gaugeFill" d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round"
+            stroke-dasharray="0 251" style="transition:stroke-dasharray 1.5s cubic-bezier(0.16,1,0.3,1)"/>
+          <!-- Needle -->
+          <line id="gaugeNeedle" x1="100" y1="110" x2="100" y2="42" stroke="var(--navy)" stroke-width="3" stroke-linecap="round"
+            style="transform-origin:100px 110px;transform:rotate(0deg);transition:transform 1.5s cubic-bezier(0.16,1,0.3,1)"/>
+          <circle cx="100" cy="110" r="6" fill="var(--navy)"/>
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#059669"/>
+              <stop offset="50%" stop-color="#d97706"/>
+              <stop offset="100%" stop-color="#dc2626"/>
+            </linearGradient>
+          </defs>
+          <!-- Labels -->
+          <text x="16" y="128" font-size="10" fill="var(--navy4)" font-family="DM Mono">0%</text>
+          <text x="90" y="22" font-size="10" fill="var(--navy4)" font-family="DM Mono">50%</text>
+          <text x="172" y="128" font-size="10" fill="var(--navy4)" font-family="DM Mono">100%</text>
+        </svg>
+        <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);text-align:center;">
+          <div style="font-size:42px;font-weight:800;color:var(--amber);letter-spacing:-2px;line-height:1;" id="burnoutPct">42%</div>
+          <div style="font-size:11px;color:var(--navy4);">Burnout Risk</div>
+        </div>
+      </div>
+
+      <div class="badge badge-amber" style="font-size:12px;padding:5px 16px;" id="burnoutLabel">⚠ Moderate — Monitor Closely</div>
+      <div style="font-size:12.5px;color:var(--navy4);text-align:center;margin-top:12px;line-height:1.6;">
+        Current task density + financial stress is creating sustained pressure. Workload restructuring recommended.
+      </div>
+    </div>
+
+    <!-- Factor Breakdown -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>Stress Factor Breakdown</div>
+      </div>
+      <div id="burnoutFactors"></div>
+      <div class="divider"></div>
+      <div class="lia-box">
+        <div class="lia-box-header"><div class="lia-chip">LIA Recommendation</div></div>
+        <div class="lia-box-text" id="burnoutRec">Generating workload restructuring plan…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restructuring Plan -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--green)"></div>Suggested Workload Restructuring</div>
+    </div>
+    <div class="g3">
+      <div class="alert alert-green"><div class="alert-icon">✅</div><div class="alert-body"><div class="alert-title">Immediate: Delegate or Defer</div><div class="alert-desc">Move "Update LinkedIn profile" and "Read Chapter 9" to next week. This reduces this-week density by 28%.</div></div></div>
+      <div class="alert alert-blue"><div class="alert-icon">📅</div><div class="alert-body"><div class="alert-title">Schedule: Time Blocking</div><div class="alert-desc">Block 7–9 AM for deep work (AWS study). Block 12–1 PM for admin tasks. Protect evenings for gym + recovery.</div></div></div>
+      <div class="alert alert-amber"><div class="alert-icon">💰</div><div class="alert-body"><div class="alert-title">Address: Financial Stress Driver</div><div class="alert-desc">Setting up auto-pay for EMIs removes 3 mental overhead points per month — the single highest-ROI action.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     FINANCIAL INTELLIGENCE
+═══════════════════════ -->
+<div class="view" id="view-finance">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Financial Intelligence Module</div>
+      <div class="section-sub">Income analysis, expense health, savings optimization and risk detection</div>
+    </div>
+    <button class="btn btn-primary" onclick="runFinanceAnalysis()">🤖 Full AI Report</button>
+  </div>
+
+  <!-- Finance Input Panel -->
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Your Financial Profile</div>
+        <button class="btn btn-outline btn-sm" onclick="recalcFinance()">Recalculate</button>
+      </div>
+      <div class="g2">
+        <div class="form-group">
+          <label class="form-label">Monthly Income (₹)</label>
+          <input class="form-input font-mono" id="f-income" type="number" value="85000" oninput="recalcFinance()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fixed Expenses (₹)</label>
+          <input class="form-input font-mono" id="f-fixed" type="number" value="32000" oninput="recalcFinance()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Variable Expenses (₹)</label>
+          <input class="form-input font-mono" id="f-variable" type="number" value="24400" oninput="recalcFinance()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Total EMIs (₹)</label>
+          <input class="form-input font-mono" id="f-emi" type="number" value="28500" oninput="recalcFinance()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Monthly Savings (₹)</label>
+          <input class="form-input font-mono" id="f-savings" type="number" value="17600" oninput="recalcFinance()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Emergency Fund (₹)</label>
+          <input class="form-input font-mono" id="f-emergency" type="number" value="140000" oninput="recalcFinance()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Computed Metrics -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Computed Financial Metrics</div>
+      </div>
+      <div id="finMetrics">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>Income vs Expenses (6 Months)</div>
+      </div>
+      <div style="height:120px;" id="finBarChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Expense Category Breakdown</div>
+      </div>
+      <div id="expenseBreakdown"></div>
+    </div>
+  </div>
+
+  <!-- AI Analysis -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--amber)"></div>LIA Financial Health Report</div>
+    </div>
+    <div id="finAIReport">
+      <div class="g3">
+        <div class="alert alert-red"><div class="alert-icon">⚠️</div><div class="alert-body"><div class="alert-title">Overspending Detected</div><div class="alert-desc">Variable expenses ₹24,400 vs ₹18,000 target. Food alone ₹4,400 over budget — primary leakage point.</div></div></div>
+        <div class="alert alert-amber"><div class="alert-icon">📊</div><div class="alert-body"><div class="alert-title">Debt Ratio: 33.5%</div><div class="alert-desc">Recommended max is 30%. Each percentage point above target increases financial stress probability by 12%.</div></div></div>
+        <div class="alert alert-blue"><div class="alert-icon">💰</div><div class="alert-body"><div class="alert-title">Emergency Fund: 2.3 Months</div><div class="alert-desc">Standard recommendation is 6 months. At current savings rate, you reach 6x coverage in 13 months.</div></div></div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="runFinanceAnalysis()">Generate Full LIA Financial Strategy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     EMI MANAGER
+═══════════════════════ -->
+<div class="view" id="view-emi">
+  <div class="section-head">
+    <div>
+      <div class="section-title">EMI & Loan Manager</div>
+      <div class="section-sub">Track loans, simulate prepayment strategies, optimize your debt</div>
+    </div>
+    <button class="btn btn-primary" onclick="runEMIStrategy()">🤖 Optimize Strategy</button>
+  </div>
+
+  <div class="g3 mb20">
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:var(--red)"></div>
+      <div class="stat-label">Total EMI / Month</div>
+      <div class="stat-value text-red">₹28,500</div>
+      <div class="stat-sub down">33.5% of income</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:var(--amber)"></div>
+      <div class="stat-label">Total Outstanding</div>
+      <div class="stat-value" style="color:var(--amber)">₹24.6L</div>
+      <div class="stat-sub">3 active loans</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-tile-accent" style="background:var(--blue)"></div>
+      <div class="stat-label">Total Interest Remaining</div>
+      <div class="stat-value" style="color:var(--blue)">₹8.2L</div>
+      <div class="stat-sub">If no prepayment</div>
+    </div>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot"></div>Active Loan Portfolio</div>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Loan</th><th>Lender</th><th>Outstanding</th><th>Rate</th><th>EMI</th><th>Tenure Left</th><th>Burden</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Home Loan</strong></td>
+          <td>HDFC Bank</td>
+          <td class="mono">₹18,40,000</td>
+          <td class="mono">8.5%</td>
+          <td class="mono" style="color:var(--amber);font-weight:700">₹18,200</td>
+          <td>16yr 4mo</td>
+          <td><span class="badge badge-amber">Moderate</span></td>
+        </tr>
+        <tr>
+          <td><strong>Car Loan</strong></td>
+          <td>Axis Bank</td>
+          <td class="mono">₹4,20,000</td>
+          <td class="mono">9.2%</td>
+          <td class="mono" style="font-weight:600">₹7,300</td>
+          <td>4yr 8mo</td>
+          <td><span class="badge badge-navy">Low</span></td>
+        </tr>
+        <tr>
+          <td><strong>Personal Loan</strong></td>
+          <td>SBI</td>
+          <td class="mono">₹2,00,000</td>
+          <td class="mono text-red">12.5%</td>
+          <td class="mono" style="color:var(--red);font-weight:700">₹3,000</td>
+          <td>5yr 11mo</td>
+          <td><span class="badge badge-red">Expensive</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--green)"></div>Prepayment Simulator</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Select Loan</label>
+        <select class="form-select" id="sim-loan" onchange="calcPrepay()">
+          <option value="home">Home Loan — ₹18.4L @ 8.5%</option>
+          <option value="car">Car Loan — ₹4.2L @ 9.2%</option>
+          <option value="personal">Personal Loan — ₹2L @ 12.5%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Extra Monthly Payment (₹)</label>
+        <input class="form-input font-mono" id="sim-extra" type="number" value="5000" oninput="calcPrepay()">
+      </div>
+      <div id="simResult"></div>
+      <button class="btn btn-primary btn-sm" style="width:100%;margin-top:12px" onclick="runEMIStrategy()">Get Full AI Prepayment Strategy</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>LIA Debt Strategy</div>
+      </div>
+      <div id="emiStrategy">
+        <div class="alert alert-red mb8"><div class="alert-icon">🎯</div><div class="alert-body"><div class="alert-title">Priority 1: Clear Personal Loan First</div><div class="alert-desc">At 12.5%, it's your most expensive debt. Paying ₹6,500 extra/mo closes it in 14 months instead of 72. Saves ₹38,400 in interest.</div></div></div>
+        <div class="alert alert-blue mb8"><div class="alert-icon">🏠</div><div class="alert-body"><div class="alert-title">Priority 2: Home Loan Prepayment</div><div class="alert-desc">After clearing personal loan, redirect ₹9,500/mo to home loan. Tenure drops from 16yr4mo to 11yr6mo. Total savings: ₹4.1L.</div></div></div>
+        <div class="alert alert-green"><div class="alert-icon">🚗</div><div class="alert-body"><div class="alert-title">Priority 3: Car Loan — Hold</div><div class="alert-desc">At 9.2%, car loan is manageable. Don't prepay — invest the difference in liquid funds for better post-tax returns.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     DECISION SIMULATOR
+═══════════════════════ -->
+<div class="view" id="view-simulator">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Decision Simulator</div>
+      <div class="section-sub">Model any financial decision. LIA quantifies the exact impact on your life.</div>
+    </div>
+  </div>
+
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Simulate a Decision</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">What are you considering?</label>
+        <textarea class="form-textarea" id="sim-question" placeholder="e.g. Should I buy a ₹1.5L laptop on EMI?&#10;e.g. Should I quit my job and freelance?&#10;e.g. Should I take a ₹5L personal loan for home renovation?">Should I buy a ₹1.5 lakh laptop on 12-month EMI?</textarea>
+      </div>
+      <div class="g2">
+        <div class="form-group">
+          <label class="form-label">Cost / Amount (₹)</label>
+          <input class="form-input font-mono" id="sim-cost" type="number" placeholder="e.g. 150000" value="150000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMI Months (if applicable)</label>
+          <input class="form-input font-mono" id="sim-months" type="number" placeholder="e.g. 12" value="12">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Reasoning</label>
+        <input class="form-input" id="sim-reason" placeholder="e.g. Need for remote work, old laptop failing">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="runDecisionSim()">⚙ Simulate Impact</button>
+
+      <!-- Quick scenarios -->
+      <div style="margin-top:14px;">
+        <div style="font-size:11.5px;color:var(--navy4);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Quick Scenarios</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="quick-insight-chip" onclick="loadScenario('laptop')">💻 Laptop ₹1.5L</div>
+          <div class="quick-insight-chip" onclick="loadScenario('bike')">🏍 Bike ₹80K</div>
+          <div class="quick-insight-chip" onclick="loadScenario('vacation')">✈ Vacation ₹50K</div>
+          <div class="quick-insight-chip" onclick="loadScenario('course')">📚 Course ₹30K</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="simResultCard">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>LIA Impact Analysis</div>
+      </div>
+      <div id="simAnalysisOutput">
+        <div style="text-align:center;padding:40px 20px;color:var(--navy4);">
+          <div style="font-size:40px;margin-bottom:12px;">⚙</div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy3);">Enter a decision above</div>
+          <div style="font-size:13px;margin-top:6px;">LIA will model the exact financial impact, risk change, and strategic recommendation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Impact Comparison -->
+  <div class="sim-result" id="simDetailResult">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>Detailed Impact Comparison</div>
+    </div>
+    <div class="g4 mb16" id="simImpactTiles"></div>
+    <div id="simAIVerdict"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     FUTURE PROJECTION
+═══════════════════════ -->
+<div class="view" id="view-projection">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Future Projection Mode</div>
+      <div class="section-sub">Simulate your financial and life trajectory across time</div>
+    </div>
+    <div class="gap8">
+      <button class="btn btn-outline btn-sm" onclick="runProjection(6)">6 Months</button>
+      <button class="btn btn-primary" onclick="runProjection(12)">12 Months</button>
+    </div>
+  </div>
+
+  <div class="lia-box mb20" id="projectionLIA">
+    <div class="lia-box-header"><div class="lia-chip">↗ LIA Projection Engine</div></div>
+    <div class="lia-box-text" id="projectionText">Select a timeframe above to generate your personalized life trajectory simulation including financial runway, goal completion likelihood, and risk spikes.</div>
+  </div>
+
+  <div class="g4 mb20" id="projTiles" style="display:none"></div>
+
+  <div class="g2 mb20">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot"></div>Financial Trajectory</div>
+      </div>
+      <div style="height:140px;position:relative;" id="projChart">
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--navy4);font-size:13px;">Run projection to see chart</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Risk Spike Calendar</div>
+      </div>
+      <div id="riskCalendar">
+        <div style="font-size:13px;color:var(--navy4);padding:20px 0;">Run projection to see risk timeline</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="card-title-dot" style="background:var(--green)"></div>Goal Completion Forecast</div>
+    </div>
+    <div id="goalForecast">
+      <div style="font-size:13px;color:var(--navy4);">Run projection to see goal forecast</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════
+     DOCUMENT VAULT
+═══════════════════════ -->
+<div class="view" id="view-documents">
+  <div class="section-head">
+    <div>
+      <div class="section-title">Document Vault</div>
+      <div class="section-sub">Secure, AI-tagged document storage with expiry intelligence</div>
+    </div>
+    <button class="btn btn-primary" onclick="openDocModal()">+ Upload Document</button>
+  </div>
+
+  <div class="g4 mb20">
+    <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--green)"></div><div class="stat-label">Total Docs</div><div class="stat-value text-green">24</div><div class="stat-sub">Across 5 categories</div></div>
+    <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--red)"></div><div class="stat-label">Expiring Soon</div><div class="stat-value text-red">3</div><div class="stat-sub down">Action required</div></div>
+    <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--blue)"></div><div class="stat-label">AI-Tagged</div><div class="stat-value" style="color:var(--blue)">18</div><div class="stat-sub">75% organized</div></div>
+    <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--amber)"></div><div class="stat-label">Org Score</div><div class="stat-value" style="color:var(--amber)">62%</div><div class="stat-sub down">Needs improvement</div></div>
+  </div>
+
+  <div class="g21 mb20">
+    <div>
+      <div class="card mb16">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Urgent — Expiring Soon</div>
+        </div>
+        <div class="alert alert-red mb8">
+          <div class="alert-icon">🚨</div>
+          <div class="alert-body"><div class="alert-title">Health Insurance Policy — Expires Mar 15</div><div class="alert-desc"><strong>18 days remaining.</strong> Without renewal, medical emergency coverage lapses. Estimated renewal premium: ₹2,421/mo. Insurance gap risk: HIGH.</div></div>
+        </div>
+        <div class="alert alert-amber">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-body"><div class="alert-title">Vehicle Insurance — Expires Jun 20</div><div class="alert-desc">4 months remaining. Driving without insurance post-expiry is a ₹2,000 fine + legal liability. Set calendar reminder for Jun 1.</div></div>
+        </div>
+      </div>
+
+      <div class="card mb16">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--red)"></div>Financial Documents</div>
+        </div>
+        <div id="docFinancial"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot" style="background:var(--blue)"></div>Identity & Personal</div>
+        </div>
+        <div id="docPersonal"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <!-- Upload Zone -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot"></div>Upload Document</div>
+        </div>
+        <div class="drop-zone" onclick="openDocModal()">
+          <div style="font-size:36px;margin-bottom:10px;">📁</div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy3)">Drop files here or click to upload</div>
+          <div style="font-size:12px;color:var(--navy4);margin-top:6px;">PDF, JPG, PNG, DOCX — LIA auto-tags and summarizes</div>
+          <div style="font-size:11px;color:var(--green);margin-top:10px;font-weight:600;">✓ AI will extract expiry dates automatically</div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-title-dot"></div>Categories</div>
+        </div>
+        <div id="docCategories"></div>
+      </div>
+
+      <!-- AI Summary -->
+      <div class="lia-box">
+        <div class="lia-box-header"><div class="lia-chip">LIA Document Intel</div></div>
+        <div class="lia-box-text">Your document organization score is <strong>62/100</strong>. <em>6 critical documents are missing</em> — specifically: PAN card scan, last 3 salary slips, and property papers. Uploading these would increase your Life Score by <strong>+4 points</strong> and significantly improve loan eligibility documentation.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page-content -->
+</div><!-- /main -->
+
+<!-- ═════════════════════════════════════════════
+     NOTIFICATION PANEL
+═════════════════════════════════════════════ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <div class="notif-panel-title">🔔 Notifications</div>
+    <span class="notif-panel-close" onclick="toggleNotif()">Mark all read</span>
+  </div>
+  <div class="notif-list">
+    <div class="notif-item"><div class="notif-item-icon">🚨</div><div class="notif-item-content"><div class="notif-item-title">Health Insurance Expiring</div><div class="notif-item-desc">18 days to renewal. Premium: ₹2,421/mo. Renew now to prevent coverage gap.</div><div class="notif-item-time">Just now</div></div></div>
+    <div class="notif-item"><div class="notif-item-icon">💡</div><div class="notif-item-content"><div class="notif-item-title">Electricity Bill Overdue</div><div class="notif-item-desc">₹1,840 overdue. Late payment penalty applies after 3 more days.</div><div class="notif-item-time">2 hours ago</div></div></div>
+    <div class="notif-item"><div class="notif-item-icon">📊</div><div class="notif-item-content"><div class="notif-item-title">Budget Overspend Alert</div><div class="notif-item-desc">Food & dining exceeded by ₹4,400 this month. Trend indicates repeat next month.</div><div class="notif-item-time">Yesterday</div></div></div>
+    <div class="notif-item"><div class="notif-item-icon">🎯</div><div class="notif-item-content"><div class="notif-item-title">Goal Delay Risk — AWS Cert</div><div class="notif-item-desc">Current pace: 40% done with 48 days left. Need to complete 1.5 modules/week to stay on track.</div><div class="notif-item-time">2 days ago</div></div></div>
+    <div class="notif-item"><div class="notif-item-icon">🏠</div><div class="notif-item-content"><div class="notif-item-title">HDFC EMI Due in 2 Days</div><div class="notif-item-desc">₹18,200 due Feb 28. Auto-debit scheduled — verify account balance.</div><div class="notif-item-time">3 days ago</div></div></div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════
+     LIA CHAT WINDOW
+═════════════════════════════════════════════ -->
+<div class="chat-fab">
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <div class="chat-ava">L</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">LIA — Life Intelligence Assistant</div>
+        <div class="chat-header-status"><div class="lia-pulse" style="width:6px;height:6px"></div> Active · Analyzing your profile</div>
+      </div>
+      <div class="chat-close" onclick="toggleChat()">×</div>
+    </div>
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg lia">
+        <div class="msg-ava">L</div>
+        <div class="msg-bubble">Hi Aditya 👋 I'm <strong>LIA</strong> — your Life Intelligence Assistant. I have full context of your finances, goals, tasks, and life score. Ask me anything — I'll give you analytical, specific answers based on your actual data.</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input class="chat-input" id="chatInput" placeholder="Ask LIA anything…" onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="chat-send" onclick="sendMsg()">→</button>
+    </div>
+  </div>
+  <button class="chat-fab-btn" onclick="toggleChat()" title="Ask LIA">💬</button>
+</div>
+
+<!-- ═════════════════════════════════════════════
+     MODALS
+═════════════════════════════════════════════ -->
+
+<!-- Add Task Modal -->
+<div class="overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add Task / Reminder</div>
+      <div class="modal-close" onclick="closeModal('taskModal')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Task / Bill / Deadline</label><input class="form-input" id="mt-name" placeholder="e.g. Pay credit card bill"></div>
+      <div class="g2">
+        <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="mt-type"><option>Task</option><option>Bill Payment</option><option>EMI</option><option>Goal Milestone</option><option>Deadline</option><option>Appointment</option></select></div>
+        <div class="form-group"><label class="form-label">Due Date</label><input class="form-input" type="date" id="mt-date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Priority</label><select class="form-select" id="mt-prio"><option value="ai">🤖 Let LIA Decide</option><option value="critical">🔴 Critical</option><option value="strategic">🟡 Strategic</option><option value="routine">🟢 Routine</option></select></div>
+      <div class="form-group"><label class="form-label">Notes</label><textarea class="form-textarea" id="mt-notes" placeholder="Additional context…" style="min-height:60px"></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="addTaskFromModal()">Add Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Modal -->
+<div class="overlay" id="goalModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Define New Goal</div>
+      <div class="modal-close" onclick="closeModal('goalModal')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Goal Statement</label><input class="form-input" id="mg-title" placeholder="e.g. Learn Spanish in 6 months"></div>
+      <div class="g2">
+        <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="mg-cat"><option>Career</option><option>Financial</option><option>Health</option><option>Learning</option><option>Personal</option></select></div>
+        <div class="form-group"><label class="form-label">Target Date</label><input class="form-input" type="date" id="mg-date"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Current Situation & Resources</label><textarea class="form-textarea" id="mg-context" placeholder="Skills, time available, budget constraints…"></textarea></div>
+      <button class="btn btn-primary" style="width:100%" onclick="createGoalAI()">🤖 Create + AI Breakdown</button>
+    </div>
+  </div>
+</div>
+
+<!-- Document Modal -->
+<div class="overlay" id="docModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Upload Document</div>
+      <div class="modal-close" onclick="closeModal('docModal')">×</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Document Name</label><input class="form-input" id="md-name" placeholder="e.g. Passport Copy 2025"></div>
+      <div class="g2">
+        <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="md-cat"><option>Financial</option><option>Identity</option><option>Medical</option><option>Legal/Insurance</option><option>Property</option><option>Education</option></select></div>
+        <div class="form-group"><label class="form-label">Expiry Date</label><input class="form-input" type="date" id="md-expiry"></div>
+      </div>
+      <div class="drop-zone" style="padding:20px;margin-bottom:14px;" onclick="null">
+        <div style="font-size:24px;margin-bottom:6px;">📎</div>
+        <div style="font-size:13px;color:var(--navy3);font-weight:500">Click to select file (demo)</div>
+        <div style="font-size:11px;color:var(--navy4);margin-top:4px;">LIA will auto-extract key information</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="addDocFromModal()">Upload + AI Tag</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI Response Modal -->
+<div class="overlay" id="aiModal">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div class="modal-title" id="aiModalTitle">LIA Analysis</div>
+      <div class="modal-close" onclick="closeModal('aiModal')">×</div>
+    </div>
+    <div class="modal-body" id="aiModalBody">
+      <div style="text-align:center;padding:40px 0;">
+        <div class="spinner" style="width:36px;height:36px;border-width:3px;margin:0 auto 16px;"></div>
+        <div style="font-size:14px;color:var(--navy3);font-weight:600">LIA is generating your analysis…</div>
+        <div style="font-size:12.5px;color:var(--navy4);margin-top:6px">Powered by Claude AI — thinking analytically about your data</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════
+     JAVASCRIPT ENGINE
+═════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ══════════════════════════
+// APP STATE
+// ══════════════════════════
+const STATE = {
+  user: { name: 'Aditya Kumar', role: 'Software Engineer', exp: 3, location: 'Bengaluru' },
+  finance: {
+    income: 85000, fixed: 32000, variable: 24400,
+    emi: 28500, savings: 17600, emergency: 140000,
+    loans: [
+      { name:'Home Loan', bank:'HDFC', outstanding:1840000, rate:8.5, emi:18200, months:196 },
+      { name:'Car Loan', bank:'Axis', outstanding:420000, rate:9.2, emi:7300, months:56 },
+      { name:'Personal Loan', bank:'SBI', outstanding:200000, rate:12.5, emi:3000, months:71 }
+    ]
+  },
+  tasks: [
+    { id:1, title:'File Income Tax Return (ITR)', due:'2025-03-31', prio:'critical', done:false, type:'Deadline' },
+    { id:2, title:'HDFC Home Loan EMI — Feb', due:'2025-02-28', prio:'critical', done:false, type:'EMI' },
+    { id:3, title:'Renew Health Insurance Policy', due:'2025-03-15', prio:'critical', done:false, type:'Deadline' },
+    { id:4, title:'AWS Certification — Module 4 (EC2)', due:'2025-03-10', prio:'strategic', done:false, type:'Goal' },
+    { id:5, title:'SBI Personal Loan EMI', due:'2025-03-05', prio:'strategic', done:false, type:'EMI' },
+    { id:6, title:'Gym session — 4x this week', due:'2025-03-02', prio:'routine', done:true, type:'Health' },
+    { id:7, title:'Update LinkedIn profile', due:'2025-03-20', prio:'routine', done:false, type:'Career' },
+    { id:8, title:'Read Atomic Habits — Chapter 8', due:'2025-03-05', prio:'routine', done:false, type:'Personal' },
+    { id:9, title:'Pay electricity bill (overdue)', due:'2025-02-26', prio:'critical', done:false, type:'Bill' },
+  ],
+  goals: [
+    { id:1, title:'AWS Cloud Certification', category:'Career', progress:40, deadline:'2025-04-15', status:'at-risk' },
+    { id:2, title:'Emergency Fund ₹5 Lakh', category:'Financial', progress:28, deadline:'2025-12-31', status:'on-track' },
+    { id:3, title:'Fitness: Lose 8kg', category:'Health', progress:55, deadline:'2025-06-30', status:'on-track' },
+  ],
+  docs: [
+    { name:'ITR Filing 2023–24.pdf', cat:'Financial', size:'2.4 MB', date:'Jan 15', expiry:'Mar 31', urgent:true },
+    { name:'HDFC Home Loan Agreement.pdf', cat:'Financial', size:'1.8 MB', date:'Dec 2', expiry:null, urgent:false },
+    { name:'Form 16 AY 2023–24.pdf', cat:'Financial', size:'0.9 MB', date:'May 10', expiry:null, urgent:false },
+    { name:'Aadhaar Card.jpg', cat:'Identity', size:'0.4 MB', date:'Verified', expiry:null, urgent:false },
+    { name:'PAN Card.jpg', cat:'Identity', size:'0.3 MB', date:'Verified', expiry:null, urgent:false },
+    { name:'Health Insurance Policy.pdf', cat:'Insurance', size:'3.1 MB', date:'Mar 15 exp', expiry:'2025-03-15', urgent:true },
+  ],
+  radar: {
+    Finance: 68, Career: 65, Productivity: 79, Organization: 62, PersonalGrowth: 82, Stability: 71
+  }
+};
+
+// ══════════════════════════
+// CLOCK + DATE
+// ══════════════════════════
+function updateClock() {
+  const n = new Date();
+  const pad = x => x < 10 ? '0'+x : x;
+  document.getElementById('liveClock').textContent =
+    pad(n.getHours())+':'+pad(n.getMinutes())+':'+pad(n.getSeconds());
+}
+setInterval(updateClock, 1000); updateClock();
+
+function initDateTime() {
+  const n = new Date();
+  const h = n.getHours();
+  const tod = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  const el = document.getElementById('timeOfDay');
+  if(el) el.textContent = tod;
+  const fd = document.getElementById('fullDate');
+  if(fd) fd.textContent = n.toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+initDateTime();
+
+// ══════════════════════════
+// NAVIGATION
+// ══════════════════════════
+const PAGE_META = {
+  dashboard: { badge:'Dashboard', title:'Life Command Center' },
+  lifescore: { badge:'Intelligence', title:'Life Score Engine' },
+  radar: { badge:'Intelligence', title:'Life Balance Radar' },
+  tasks: { badge:'Planning', title:'Task & Deadline Engine' },
+  goals: { badge:'Planning', title:'Goal Decomposition Engine' },
+  burnout: { badge:'Planning', title:'Burnout & Overload Predictor' },
+  finance: { badge:'Finance', title:'Financial Intelligence' },
+  emi: { badge:'Finance', title:'EMI & Loan Manager' },
+  simulator: { badge:'Finance', title:'Decision Simulator' },
+  projection: { badge:'Intelligence', title:'Future Projection' },
+  documents: { badge:'Intelligence', title:'Document Vault' },
+};
+
+function goTo(id, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const view = document.getElementById('view-'+id);
+  if(view) view.classList.add('active');
+  if(navEl) navEl.classList.add('active');
+  else {
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+    });
+  }
+  const meta = PAGE_META[id] || { badge:id, title:id };
+  const pb = document.getElementById('pageBadge');
+  const pt = document.getElementById('pageTitle');
+  if(pb) pb.textContent = meta.badge;
+  if(pt) pt.textContent = meta.title;
+  closeNotif();
+  window.scrollTo({ top:0, behavior:'smooth' });
+  onViewEnter(id);
+}
+
+function onViewEnter(id) {
+  if(id==='dashboard') { renderDashTasks(); renderDashEMI(); renderFinSnapshot(); initWeeklyAI(); }
+  else if(id==='lifescore') { animateLifeScore(); renderScoreBreakdown(); }
+  else if(id==='radar') { drawRadar(); renderRadarBars(); initRadarInsight(); }
+  else if(id==='tasks') { renderAllTasks(); buildCalendar(); }
+  else if(id==='goals') { renderGoalsList(); }
+  else if(id==='burnout') { animateBurnout(); renderBurnoutFactors(); initBurnoutRec(); }
+  else if(id==='finance') { recalcFinance(); buildFinBarChart(); buildExpenseBreakdown(); }
+  else if(id==='emi') { calcPrepay(); }
+  else if(id==='documents') { renderDocs(); }
+  else if(id==='simulator') {}
+}
+
+// ══════════════════════════
+// CLAUDE API
+// ══════════════════════════
+const SYSTEM_PROMPT = `You are LIA (Life Intelligence Assistant), an advanced AI embedded in Aditya Kumar's personal Life Operating System.
+
+USER PROFILE:
+- Name: Aditya Kumar, 28, Software Engineer (3yr exp), Bengaluru
+- Monthly Income: ₹85,000 | Take-home after tax
+
+FINANCIAL DATA:
+- Fixed Expenses: ₹32,000/mo | Variable: ₹24,400/mo (34% over budget) | EMIs: ₹28,500/mo
+- Savings: ₹17,600/mo (20.7% rate) | Emergency Fund: ₹1,40,000 (2.3 months coverage)
+- Home Loan: ₹18.4L @ 8.5% (EMI ₹18,200, 16yr4mo left)
+- Car Loan: ₹4.2L @ 9.2% (EMI ₹7,300, 4yr8mo left)
+- Personal Loan: ₹2L @ 12.5% (EMI ₹3,000, 5yr11mo left)
+- Debt-to-income: 33.5% | Financial Health: 68/100
+
+TASKS & DEADLINES:
+- CRITICAL: ITR due Mar 31, HDFC EMI Feb 28, Health Insurance renewal Mar 15, Electricity bill overdue
+- STRATEGIC: AWS Module 4 (Mar 10), SBI EMI (Mar 5)
+
+GOALS:
+- AWS Cloud Certification: 40% done, due Apr 15 — AT RISK (needs 1.5 modules/week)
+- Emergency Fund ₹5L: 28% done (₹1.4L saved), due Dec 31
+- Fitness (lose 8kg): 55% done, due Jun 30 — ON TRACK
+
+LIFE METRICS:
+- Life Score: 74/100 | Burnout Risk: 42% (Moderate)
+- Radar: Finance 68, Career 65, Productivity 79, Organization 62, PersonalGrowth 82, Stability 71
+
+BEHAVIORAL RULES:
+1. Never give generic motivational responses
+2. Always reference specific numbers from the user's actual data
+3. Provide cause-effect reasoning with logic chains
+4. When asked about improvements, prioritize by ROI and urgency
+5. Use structured responses: situation → analysis → specific action → expected outcome
+6. Be concise but analytical. Max 150 words unless asked for full report.
+7. Calculate actual numbers when relevant (interest savings, timeline changes, score impact)`;
+
+async function callLIA(userMsg, context = '') {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYSTEM_PROMPT + (context ? '\n\nADDITIONAL CONTEXT:\n' + context : ''),
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  });
+  const d = await res.json();
+  return d.content?.map(c => c.text || '').join('') || 'Unable to generate response.';
+}
+
+function fmt(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n\n/g, '</p><p style="margin-top:8px">')
+    .replace(/\n- /g, '<br>• ')
+    .replace(/\n(\d+)\. /g, '<br><strong>$1.</strong> ')
+    .replace(/\n/g, '<br>');
+}
+
+// ══════════════════════════
+// DASHBOARD INIT
+// ══════════════════════════
+async function initDashboard() {
+  renderDashTasks();
+  renderDashEMI();
+  renderFinSnapshot();
+  await initWeeklyAI();
+}
+
+async function initWeeklyAI() {
+  const el = document.getElementById('dashBriefingText');
+  const timeEl = document.getElementById('briefingTime');
+  const wkEl = document.getElementById('weeklyAISummary');
+  if(!el) return;
+  try {
+    const n = new Date(); const h = n.getHours();
+    const tod = h<12?'morning':h<17?'afternoon':'evening';
+    const r = await callLIA(
+      `Generate a concise, analytical ${tod} briefing. Cover: (1) most urgent action today, (2) biggest financial risk, (3) one specific career insight. Max 60 words. No greetings. Start directly with the insight.`
+    );
+    el.innerHTML = fmt(r);
+    if(timeEl) timeEl.textContent = 'Updated ' + new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+    const wkr = await callLIA(
+      `Generate a weekly strategic summary in exactly 3 bullet points (no intro text):
+1. Key risk this week with specific number
+2. Highest-ROI action to take (with expected outcome)
+3. One metric improving and one declining
+Each bullet: max 18 words. Start with the bullet point directly, no label prefix.`
+    );
+    if(wkEl) wkEl.innerHTML = fmt(wkr);
+  } catch(e) {
+    if(el) el.innerHTML = '<strong>Priority now:</strong> Pay overdue electricity bill (₹1,840). <strong>Financial risk:</strong> Variable expenses 34% over budget — food/dining ₹4,400 above limit. <strong>AWS cert</strong> at 40% needs acceleration to 1.5 modules/week to hit April deadline.';
+    if(timeEl) timeEl.textContent = 'Demo mode';
+    if(wkEl) wkEl.innerHTML = '• <strong>Critical:</strong> Debt-to-income at 33.5% — exceeds safe 30% threshold<br>• <strong>High ROI:</strong> Close personal loan early → saves ₹38K interest, frees ₹3K/mo<br>• <strong>Improving:</strong> Goal completion +8% | <strong>Declining:</strong> Financial health score −3';
+  }
+}
+
+// ══════════════════════════
+// DASHBOARD RENDER
+// ══════════════════════════
+function renderDashTasks() {
+  const el = document.getElementById('dashTaskList');
+  if(!el) return;
+  const topTasks = STATE.tasks.filter(t=>!t.done).slice(0,4);
+  el.innerHTML = topTasks.map(t => `
+    <div class="task-row ${t.done?'done':''}">
+      <div class="task-check ${t.done?'checked':''}" onclick="toggleTaskId(${t.id})">
+        ${t.done?'✓':''}
+      </div>
+      <div class="task-body">
+        <div class="task-title ${t.done?'strikethrough':''}">${t.title}</div>
+        <div class="task-meta">
+          <span class="badge badge-${t.prio==='critical'?'red':t.prio==='strategic'?'amber':'navy'}">${t.prio}</span>
+          <span class="task-due ${isDue(t.due)?'red':''}">
+            ${isDue(t.due)?'⚠ Overdue':'Due'}: ${formatDate(t.due)}
+          </span>
+          <span class="badge badge-navy">${t.type}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDashEMI() {
+  const el = document.getElementById('dashEmiList');
+  if(!el) return;
+  const items = [
+    { icon:'🏠', name:'HDFC Home Loan', due:'Feb 28', amt:'₹18,200', status:'Due in 2 days', color:'red' },
+    { icon:'💡', name:'Electricity (Overdue)', due:'Overdue', amt:'₹1,840', status:'Pay immediately', color:'red' },
+    { icon:'📡', name:'Jio Fiber Broadband', due:'Mar 5', amt:'₹999', status:'In 7 days', color:'amber' },
+  ];
+  el.innerHTML = items.map(i => `
+    <div class="bill-item">
+      <div class="bill-icon-wrap" style="background:${i.color==='red'?'var(--red-light)':'var(--amber-light)'}">${i.icon}</div>
+      <div class="bill-info">
+        <div class="bill-name">${i.name}</div>
+        <div class="bill-details">${i.due} · ${i.status}</div>
+      </div>
+      <div class="bill-right">
+        <div class="bill-amount">${i.amt}</div>
+        <div class="bill-status-text" style="color:var(--${i.color})">${i.status}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFinSnapshot() {
+  const el = document.getElementById('finSnapshot');
+  if(!el) return;
+  const { income, fixed, variable, emi, savings } = STATE.finance;
+  const total = fixed + variable + emi;
+  const savRate = Math.round((savings/income)*100);
+  const dti = Math.round((emi/income)*100);
+
+  const items = [
+    { label:'Monthly Income', val:'₹'+income.toLocaleString('en-IN'), bar:100, color:'green' },
+    { label:'Total Outflow', val:'₹'+total.toLocaleString('en-IN'), bar:Math.round((total/income)*100), color:'red' },
+    { label:'Net Savings', val:'₹'+savings.toLocaleString('en-IN'), bar:savRate, color:'green' },
+    { label:'EMI Burden', val:dti+'% of income', bar:dti, color:dti>30?'red':'amber' },
+  ];
+  el.innerHTML = items.map(i=>`
+    <div class="prog-item">
+      <div class="prog-header">
+        <span class="prog-name">${i.label}</span>
+        <span class="prog-pct">${i.val}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill prog-${i.color}" style="width:0%" data-w="${Math.min(i.bar,100)}%"></div></div>
+    </div>
+  `).join('');
+  setTimeout(() => {
+    el.querySelectorAll('.prog-fill').forEach(f => f.style.width = f.dataset.w);
+  }, 100);
+}
+
+// ══════════════════════════
+// LIFE SCORE
+// ══════════════════════════
+function animateLifeScore() {
+  const arc = document.getElementById('lifeScoreArc');
+  if(!arc) return;
+  const score = 74;
+  const circ = 2 * Math.PI * 76;
+  setTimeout(() => {
+    arc.style.strokeDasharray = `${(score/100)*circ} ${circ}`;
+  }, 200);
+
+  // Score history chart
+  buildScoreHistChart();
+}
+
+function renderScoreBreakdown() {
+  const el = document.getElementById('scoreBreakdown');
+  if(!el) return;
+  const dims = [
+    { label:'Goal Achievement', pct:81, color:'green' },
+    { label:'Task Completion', pct:79, color:'blue' },
+    { label:'Financial Health', pct:68, color:'amber' },
+    { label:'Document Organization', pct:62, color:'purple' },
+    { label:'Deadline Adherence', pct:75, color:'navy' },
+    { label:'Savings Discipline', pct:57, color:'red' },
+  ];
+  el.innerHTML = dims.map(d=>`
+    <div class="prog-item">
+      <div class="prog-header">
+        <span class="prog-name">${d.label}</span>
+        <span class="prog-pct">${d.pct}%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill prog-${d.color}" style="width:0%" data-w="${d.pct}%"></div></div>
+    </div>
+  `).join('');
+  setTimeout(() => el.querySelectorAll('.prog-fill').forEach(f=>f.style.width=f.dataset.w), 100);
+}
+
+function buildScoreHistChart() {
+  const el = document.getElementById('scoreHistChart');
+  if(!el) return;
+  const scores = [63, 65, 68, 72, 70, 74];
+  const months = ['Sep','Oct','Nov','Dec','Jan','Feb'];
+  const max = 100;
+  const h = 90;
+  el.innerHTML = `<div style="display:flex;gap:10px;align-items:flex-end;height:${h}px;padding:0 4px;">
+    ${scores.map((s,i) => `
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--navy4)">${s}</div>
+        <div style="flex:1;width:100%;border-radius:4px 4px 0 0;min-height:4px;
+          background:${i===5?'linear-gradient(180deg,#059669,#10b981)':'linear-gradient(180deg,#2563eb,#60a5fa)'};
+          height:${Math.round((s/max)*(h-20))}px;transition:height .8s"></div>
+        <div style="font-size:10px;color:var(--navy4);font-family:'DM Mono',monospace">${months[i]}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+async function analyzeLifeScore() {
+  openAIModal('Life Score Intelligence Report');
+  try {
+    const r = await callLIA(`Provide a comprehensive life score analysis. Format:
+1. WHY 74 (not higher): 2 specific reasons with data points
+2. CRITICAL gaps: 2 specific items causing score loss with point values
+3. 30-DAY ACTION PLAN: 4 specific daily habits with expected score impact
+4. WHAT'S WORKING WELL: 2 strengths to maintain
+Be precise. No filler. Reference specific numbers.`);
+    showAIModal('Life Score Analysis — LIA Report', r);
+  } catch(e) {
+    showAIModal('Life Score Analysis', `<strong>Why 74/100:</strong><br><br>Two factors are dragging your score below 80: (1) Financial discipline — overspending 34% above variable budget and debt-to-income at 33.5% pulls finance score to 68. (2) Document gaps — 6 critical files unorganized, health insurance expiring, ITR documents incomplete lowers org score to 62.<br><br><strong>Quick Wins:</strong> Pay electricity bill today (+1 task point). Upload PAN/salary slips (+2 org points). Set up SIP (+1 finance point).<br><br><strong>30-Day Plan:</strong> Week 1: Renew insurance + organize docs. Week 2-3: AWS module 4+5. Week 4: Review EMI prepayment plan.`);
+  }
+}
+
+// ══════════════════════════
+// RADAR CHART
+// ══════════════════════════
+function drawRadar() {
+  const svg = document.getElementById('radarSVG');
+  if(!svg) return;
+  svg.innerHTML = '';
+  const cx=150, cy=150, maxR=110;
+  const dims = Object.keys(STATE.radar);
+  const vals = Object.values(STATE.radar);
+  const n = dims.length;
+  const angles = dims.map((_,i) => (i/n)*2*Math.PI - Math.PI/2);
+
+  // BG rings
+  [20,40,60,80,100].forEach(ring => {
+    const pts = angles.map(a => `${cx+Math.cos(a)*maxR*(ring/100)},${cy+Math.sin(a)*maxR*(ring/100)}`).join(' ');
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points',pts);
+    poly.setAttribute('class','radar-bg-line');
+    svg.appendChild(poly);
+  });
+
+  // Spokes + labels
+  angles.forEach((a,i) => {
+    const x2 = cx + Math.cos(a)*maxR, y2 = cy + Math.sin(a)*maxR;
+    const l = document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
+    l.setAttribute('class','radar-spoke');
+    svg.appendChild(l);
+
+    // Labels
+    const lx = cx + Math.cos(a)*( maxR+22), ly = cy + Math.sin(a)*(maxR+22);
+    const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',lx);txt.setAttribute('y',ly+4);
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('class','radar-label');
+    txt.textContent = dims[i];
+    svg.appendChild(txt);
+  });
+
+  // Data polygon
+  const dataPts = angles.map((a,i) => {
+    const r = maxR*(vals[i]/100);
+    return `${cx+Math.cos(a)*r},${cy+Math.sin(a)*r}`;
+  }).join(' ');
+  const dp = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  dp.setAttribute('points',angles.map(a=>`${cx},${cy}`).join(' '));
+  dp.setAttribute('class','radar-area');
+  svg.appendChild(dp);
+  setTimeout(()=>dp.setAttribute('points',dataPts),200);
+
+  // Data dots
+  angles.forEach((a,i) => {
+    const r = maxR*(vals[i]/100);
+    const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',cx+Math.cos(a)*r);dot.setAttribute('cy',cy+Math.sin(a)*r);
+    dot.setAttribute('r','5');dot.setAttribute('fill','#059669');dot.setAttribute('stroke','white');dot.setAttribute('stroke-width','2');
+    dot.style.transition='all 0.8s';
+    svg.appendChild(dot);
+  });
+
+  // Legend
+  const lgEl = document.getElementById('radarLegend');
+  if(lgEl) {
+    const colors=['#059669','#2563eb','#7c3aed','#d97706','#dc2626','#0891b2'];
+    lgEl.innerHTML = dims.map((d,i)=>`
+      <div class="radar-legend-item">
+        <div class="radar-legend-dot" style="background:${colors[i%colors.length]}"></div>
+        <span>${d}</span>
+        <span class="font-mono text-sm text-muted" style="margin-left:auto">${vals[i]}</span>
+      </div>`).join('');
+  }
+}
+
+function renderRadarBars() {
+  const el = document.getElementById('radarBars');
+  if(!el) return;
+  const colorMap = { Finance:'amber', Career:'amber', Productivity:'green', Organization:'red', PersonalGrowth:'green', Stability:'blue' };
+  el.innerHTML = Object.entries(STATE.radar).map(([k,v])=>`
+    <div class="prog-item">
+      <div class="prog-header"><span class="prog-name">${k}</span><span class="prog-pct">${v}/100</span></div>
+      <div class="prog-track"><div class="prog-fill prog-${colorMap[k]||'navy'}" style="width:0%" data-w="${v}%"></div></div>
+    </div>`).join('');
+  setTimeout(()=>el.querySelectorAll('.prog-fill').forEach(f=>f.style.width=f.dataset.w),100);
+}
+
+async function initRadarInsight() {
+  const el = document.getElementById('radarInsight');
+  if(!el) return;
+  try {
+    const r = await callLIA(`Analyze the life balance radar: Finance:68, Career:65, Productivity:79, Organization:62, PersonalGrowth:82, Stability:71. 
+    In 3 sentences: (1) What's causing the imbalance pattern, (2) Which low dimension is dragging others, (3) One specific intervention. Max 70 words.`);
+    el.innerHTML = fmt(r);
+  } catch(e) {
+    el.innerHTML = 'Finance (68) and Career (65) are your two weakest dimensions — and they\'re <strong>causally linked</strong>: financial stress is limiting career investment (courses, certifications). Organization (62) is the hidden multiplier — poor document management adds cognitive overhead that depresses all other scores. Fixing organization first creates a compound effect.';
+  }
+}
+
+async function analyzeRadar() {
+  openAIModal('Life Balance Deep Analysis');
+  try {
+    const r = await callLIA(`Provide a deep life balance analysis for the radar scores: Finance:68, Career:65, Productivity:79, Organization:62, PersonalGrowth:82, Stability:71.
+    Structure:
+    1. IMBALANCE PATTERN: What the distribution reveals about lifestyle priorities
+    2. CRITICAL WEAK LINK: Which low score is most damaging to overall life quality (with logical reasoning)
+    3. LEVERAGE POINTS: 2 specific changes that would improve multiple dimensions simultaneously
+    4. MOMENTUM AREAS: What's driving the high scores and how to maintain them
+    Be analytical and specific. Reference actual user data.`);
+    showAIModal('Life Balance Intelligence Report', r);
+  } catch(e) {
+    showAIModal('Life Balance Analysis', `Pattern: Your high Personal Growth (82) and Productivity (79) show strong intrinsic motivation — but Finance (68) and Career (65) indicate the motivation isn't being channeled into financial outcomes yet. Organization (62) is the structural bottleneck.<br><br>Critical weak link: Finance — it's a ceiling on Career growth (can't afford certifications freely), which limits Stability. It's a cascade, not an isolated issue.<br><br>Leverage point: Closing the Personal Loan 14 months early frees ₹3K/month → reinvest in certifications → Career improves → Stability rises. One action, three dimensions improved.`);
+  }
+}
+
+// ══════════════════════════
+// TASKS ENGINE
+// ══════════════════════════
+function renderAllTasks() {
+  const cats = { critical:[], strategic:[], routine:[] };
+  STATE.tasks.forEach(t => {
+    if(cats[t.prio]) cats[t.prio].push(t);
+  });
+  ['critical','strategic','routine'].forEach(cat => {
+    const el = document.getElementById('tasks-'+cat);
+    if(!el) return;
+    if(!cats[cat].length) { el.innerHTML = '<div style="font-size:13px;color:var(--navy4);padding:8px 0">No tasks in this category</div>'; return; }
+    el.innerHTML = cats[cat].map(t=>`
+      <div class="task-row ${t.done?'done':''}">
+        <div class="task-check ${t.done?'checked':''}" onclick="toggleTaskId(${t.id})">${t.done?'✓':''}</div>
+        <div class="task-body">
+          <div class="task-title ${t.done?'strikethrough':''}">${t.title}</div>
+          <div class="task-meta">
+            <span class="badge badge-${cat==='critical'?'red':cat==='strategic'?'amber':'navy'}">${cat}</span>
+            <span class="task-due ${isDue(t.due)?'red':''}">${isDue(t.due)?'⚠ OVERDUE':'Due'}: ${formatDate(t.due)}</span>
+            <span class="badge badge-navy">${t.type}</span>
+          </div>
+        </div>
+      </div>`).join('');
+  });
+  const cc = document.getElementById('criticalCount');
+  const sc = document.getElementById('strategicCount');
+  if(cc) cc.textContent = cats.critical.filter(t=>!t.done).length;
+  if(sc) sc.textContent = cats.strategic.filter(t=>!t.done).length;
+}
+
+function toggleTaskId(id) {
+  const t = STATE.tasks.find(x=>x.id===id);
+  if(t) { t.done = !t.done; renderAllTasks(); renderDashTasks(); }
+}
+
+function addQuickTask() {
+  const name = document.getElementById('qt-name').value.trim();
+  if(!name) return;
+  const date = document.getElementById('qt-date').value || new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  let prio = document.getElementById('qt-prio').value;
+  if(prio==='ai') prio = 'strategic';
+  STATE.tasks.unshift({ id:Date.now(), title:name, due:date, prio, done:false, type:'Task' });
+  document.getElementById('qt-name').value = '';
+  renderAllTasks();
+  renderDashTasks();
+}
+
+function addTaskFromModal() {
+  const name = document.getElementById('mt-name').value.trim();
+  if(!name) return;
+  const date = document.getElementById('mt-date').value || new Date(Date.now()+7*86400000).toISOString().split('T')[0];
+  let prio = document.getElementById('mt-prio').value;
+  if(prio==='ai') prio='strategic';
+  STATE.tasks.unshift({ id:Date.now(), title:name, due:date, prio:prio.replace('🔴 ','').replace('🟡 ','').replace('🟢 ',''), done:false, type:document.getElementById('mt-type').value });
+  closeModal('taskModal');
+  renderAllTasks();
+  renderDashTasks();
+}
+
+function addTaskQuick() { openModal('taskModal'); }
+
+async function generateDailyPlan() {
+  const el = document.getElementById('dailyPlanText');
+  if(!el) return;
+  el.innerHTML = '<span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>';
+  try {
+    const overdue = STATE.tasks.filter(t=>!t.done&&isDue(t.due)).map(t=>t.title);
+    const critical = STATE.tasks.filter(t=>!t.done&&t.prio==='critical').map(t=>t.title);
+    const r = await callLIA(
+      `Create a time-blocked daily execution plan for today. Overdue: ${overdue.join(', ')||'none'}. Critical: ${critical.join(', ')||'none'}.
+      Format as Morning Block / Afternoon Block / Evening Block with specific tasks and duration. Max 100 words. Be practical, not motivational.`
+    );
+    el.innerHTML = fmt(r);
+  } catch(e) {
+    el.innerHTML = '<strong>Morning 7–9 AM:</strong> Pay overdue electricity bill (15 min) → HDFC EMI confirmation (10 min) → AWS Module 4 study (60 min).<br><strong>Afternoon 12–1 PM:</strong> Health insurance renewal research (30 min) → ITR document checklist (30 min).<br><strong>Evening 7–9 PM:</strong> Gym session (60 min) → Review tomorrow\'s priorities (15 min).';
+  }
+}
+
+function buildCalendar() {
+  const el = document.getElementById('miniCal');
+  if(!el) return;
+  const n = new Date();
+  const [y,m,today] = [n.getFullYear(), n.getMonth(), n.getDate()];
+  const first = new Date(y,m,1).getDay();
+  const days = new Date(y,m+1,0).getDate();
+  const mNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Event days
+  const evts = {};
+  STATE.tasks.filter(t=>!t.done).forEach(t=>{
+    const d = new Date(t.due);
+    if(d.getFullYear()===y&&d.getMonth()===m) evts[d.getDate()]=(evts[d.getDate()]||0)+1;
+  });
+  let html = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    <div style="font-weight:700;font-size:14px">${mNames[m]} ${y}</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;">
+    ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div style="font-size:10px;color:var(--navy4);padding:4px;font-weight:600">${d}</div>`).join('')}
+    ${Array(first).fill('<div></div>').join('')}
+    ${Array.from({length:days},(_,i)=>{
+      const d=i+1;
+      const isToday = d===today;
+      const hasEvt = evts[d];
+      return `<div style="font-size:12px;padding:5px 0;border-radius:6px;cursor:pointer;position:relative;
+        background:${isToday?'var(--navy)':'transparent'};
+        color:${isToday?'white':'var(--navy)'};
+        font-weight:${isToday?'700':'400'}"
+        onclick="null">${d}${hasEvt?`<span style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:${isToday?'#6ee7b7':'var(--red)'}"></span>`:''}
+      </div>`;
+    }).join('')}
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ══════════════════════════
+// GOALS ENGINE
+// ══════════════════════════
+function renderGoalsList() {
+  const el = document.getElementById('goalsList');
+  if(!el) return;
+  const colorMap = { 'at-risk':'red', 'on-track':'green', 'behind':'amber' };
+  el.innerHTML = STATE.goals.map(g=>`
+    <div style="margin-bottom:14px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;" onclick="askLIAAboutGoal(${g.id})">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
+        <div>
+          <div style="font-size:14px;font-weight:700">${g.title}</div>
+          <div style="font-size:12px;color:var(--navy4);margin-top:2px">${g.category} · Due ${g.deadline}</div>
+        </div>
+        <span class="badge badge-${colorMap[g.status]||'navy'}">${g.status.replace('-',' ')}</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill prog-${colorMap[g.status]==='red'?'amber':'green'}" style="width:${g.progress}%"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <span style="font-size:12px;color:var(--navy4)">Progress</span>
+        <span class="font-mono text-sm">${g.progress}%</span>
+      </div>
+    </div>`).join('');
+}
+
+async function decomposeGoal() {
+  const input = document.getElementById('goal-input').value;
+  const date = document.getElementById('goal-date').value;
+  const context = document.getElementById('goal-context').value;
+  const cat = document.getElementById('goal-cat').value;
+  if(!input.trim()) return;
+
+  openAIModal('Goal Decomposition — LIA Execution Engine');
+  try {
+    const r = await callLIA(
+      `Decompose this goal into a precise execution roadmap:
+      Goal: "${input}"
+      Category: ${cat} | Target Date: ${date||'6 months'} | Context: ${context}
+      
+      Format EXACTLY:
+      SUCCESS PROBABILITY: [X]% — [1 sentence reason]
+      
+      PHASE 1 (Month 1–2): [title]
+      • [milestone 1]
+      • [milestone 2]
+      
+      PHASE 2 (Month 3–4): [title]
+      • [milestone 1]
+      • [milestone 2]
+      
+      PHASE 3 (Month 5–6): [title]
+      • [milestone 1]
+      • [milestone 2]
+      
+      WEEKLY COMMITMENT: [X] hours/week minimum
+      BIGGEST RISK: [specific risk with mitigation]
+      FIRST ACTION THIS WEEK: [single concrete action]
+      
+      Be specific. Use real numbers. No fluff.`,
+      `User's current context: ${context}`
+    );
+    showAIModal('Goal Execution Roadmap: '+input, r);
+
+    // Also add to active goals
+    STATE.goals.push({ id:Date.now(), title:input, category:cat, progress:0, deadline:date||'2025-12-31', status:'on-track' });
+    renderGoalsList();
+    document.getElementById('goalRoadmapCard').style.display = 'block';
+    document.getElementById('goalInsightText').innerHTML = fmt(r.split('\n').slice(0,3).join('\n'));
+  } catch(e) {
+    showAIModal('Goal Roadmap: '+input, `<strong>Success Probability: 74%</strong> — achievable with 8hr/week consistency<br><br><strong>Phase 1 (Month 1–2):</strong> Foundation<br>• AWS Cloud Practitioner certification (covers cloud basics)<br>• Start Python data libraries: Pandas, NumPy fundamentals<br><br><strong>Phase 2 (Month 3–4):</strong> Specialization<br>• AWS Data Analytics Specialty (Glue, Athena, Redshift)<br>• Build first data pipeline project on GitHub<br><br><strong>Phase 3 (Month 5–6):</strong> Application<br>• 3 portfolio projects with real datasets<br>• Begin job applications targeting ₹18–22L packages<br><br><strong>Weekly Commitment:</strong> 8 hours minimum<br><strong>Biggest Risk:</strong> Current AWS cert is at 40% — falling behind here signals future roadmap slippage<br><strong>First Action:</strong> Block 7–9 AM daily for AWS study this week`);
+  }
+}
+
+async function createGoalAI() {
+  document.getElementById('goal-input').value = document.getElementById('mg-title').value;
+  document.getElementById('goal-cat').value = document.getElementById('mg-cat').value;
+  document.getElementById('goal-date').value = document.getElementById('mg-date').value;
+  document.getElementById('goal-context').value = document.getElementById('mg-context').value;
+  closeModal('goalModal');
+  goTo('goals', null);
+  setTimeout(decomposeGoal, 300);
+}
+
+async function askLIAAboutGoal(id) {
+  const g = STATE.goals.find(x=>x.id===id);
+  if(!g) return;
+  openAIModal(`Goal Analysis: ${g.title}`);
+  try {
+    const r = await callLIA(`Analyze this goal's current status and provide corrective guidance:
+    Goal: ${g.title} | Category: ${g.category} | Progress: ${g.progress}% | Deadline: ${g.deadline} | Status: ${g.status}
+    Provide: (1) current trajectory analysis (on time/behind), (2) corrective weekly action, (3) revised deadline if needed.`);
+    showAIModal('Goal Intelligence: '+g.title, r);
+  } catch(e) {
+    showAIModal('Goal Update', 'At '+g.progress+'% with current pace, this goal needs '+Math.round((100-g.progress)/5)+' more focused weeks. Increase weekly commitment by 20% to stay on track.');
+  }
+}
+
+// ══════════════════════════
+// BURNOUT PREDICTOR
+// ══════════════════════════
+function animateBurnout() {
+  const prob = 42;
+  const totalArc = 251;
+  const fill = document.getElementById('gaugeFill');
+  const needle = document.getElementById('gaugeNeedle');
+  const deg = (prob / 100) * 180 - 90;
+  setTimeout(()=>{
+    if(fill) fill.style.strokeDasharray = `${(prob/100)*totalArc} ${totalArc}`;
+    if(needle) needle.style.transform = `rotate(${deg}deg)`;
+  }, 300);
+}
+
+function renderBurnoutFactors() {
+  const el = document.getElementById('burnoutFactors');
+  if(!el) return;
+  const factors = [
+    { label:'Task Density (this week)', pct:68, color:'amber', note:'5 tasks, 3 critical' },
+    { label:'Financial Stress', pct:55, color:'amber', note:'Overspend 34%, loan burden 33.5%' },
+    { label:'Goal Pressure', pct:40, color:'navy', note:'AWS cert at-risk, 3 active goals' },
+    { label:'Missed Deadlines', pct:38, color:'red', note:'2 overdue this month' },
+    { label:'Sleep/Recovery', pct:30, color:'green', note:'Gym maintained, low immediate risk' },
+  ];
+  el.innerHTML = factors.map(f=>`
+    <div class="prog-item">
+      <div class="prog-header">
+        <span class="prog-name">${f.label}</span>
+        <span class="prog-pct font-mono">${f.pct}%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill prog-${f.color}" style="width:0%" data-w="${f.pct}%"></div></div>
+      <div style="font-size:11px;color:var(--navy4);margin-top:3px">${f.note}</div>
+    </div>`).join('');
+  setTimeout(()=>el.querySelectorAll('.prog-fill').forEach(f=>f.style.width=f.dataset.w),100);
+}
+
+async function initBurnoutRec() {
+  const el = document.getElementById('burnoutRec');
+  if(!el) return;
+  try {
+    const r = await callLIA(`Based on: task density score 68/100, financial stress 55/100, goal pressure 40/100, 2 missed deadlines. 
+    Provide a specific workload restructuring plan in 50 words max. Be direct about what to defer vs what to keep.`);
+    el.innerHTML = fmt(r);
+  } catch(e) {
+    el.innerHTML = 'Defer "Update LinkedIn" and reading goal to next week (-28% density). Set up EMI auto-pay this week — removes 3 recurring mental overhead tasks. Keep gym schedule — it\'s your primary stress buffer.';
+  }
+}
+
+async function analyzeBurnout() {
+  openAIModal('Burnout Risk — Full Analysis');
+  try {
+    const r = await callLIA(`Full burnout risk analysis for current load: 5 tasks due this week (3 critical), financial stress from 34% overspend + 33.5% debt ratio, AWS goal at risk. Burnout probability estimated at 42%.
+    Provide:
+    1. ROOT CAUSE: Primary driver (not symptoms)
+    2. 72-HOUR INTERVENTION: 3 specific actions to reduce risk immediately
+    3. STRUCTURAL FIX: What needs to change in the system (not just short-term)
+    4. WARNING SIGNAL: What to watch for that indicates deterioration
+    Max 120 words. Analytical, not motivational.`);
+    showAIModal('Burnout Risk Intelligence Report', r);
+  } catch(e) {
+    showAIModal('Burnout Analysis', `Root cause: <strong>task density is not the primary driver</strong> — it's the financial cognitive load. When financial concerns are unresolved, they create background processing that consumes 20–30% of cognitive capacity regardless of actual task count.<br><br>72-hour intervention: (1) Set up EMI auto-pay for all 3 loans today. (2) Pay electricity bill — close open loop. (3) Block 2 AWS study sessions this week — progress on goals reduces anxiety more than completion.<br><br>Structural fix: Automate all recurring payments. Your burnout risk drops from 42% to ~25% when 7 recurring financial tasks are automated.`);
+  }
+}
+
+// ══════════════════════════
+// FINANCE MODULE
+// ══════════════════════════
+function recalcFinance() {
+  const income = parseInt(document.getElementById('f-income')?.value)||85000;
+  const fixed = parseInt(document.getElementById('f-fixed')?.value)||32000;
+  const variable = parseInt(document.getElementById('f-variable')?.value)||24400;
+  const emi = parseInt(document.getElementById('f-emi')?.value)||28500;
+  const savings = parseInt(document.getElementById('f-savings')?.value)||17600;
+  const emergency = parseInt(document.getElementById('f-emergency')?.value)||140000;
+
+  const totalExp = fixed + variable + emi;
+  const savRate = ((savings/income)*100).toFixed(1);
+  const dti = ((emi/income)*100).toFixed(1);
+  const efCoverage = (emergency/totalExp).toFixed(1);
+  const cashflow = income - totalExp;
+  const finScore = Math.round(
+    (savRate>20?25:savRate>15?18:10) +
+    (dti<30?25:dti<35?18:10) +
+    (efCoverage>=6?25:efCoverage>=3?18:10) +
+    (cashflow>0?25:10)
+  );
+
+  STATE.finance = {...STATE.finance, income, fixed, variable, emi, savings, emergency};
+
+  const el = document.getElementById('finMetrics');
+  if(!el) return;
+  const metrics = [
+    { label:'Savings Rate', val:savRate+'%', target:'≥25%', status:parseFloat(savRate)>=25?'good':parseFloat(savRate)>=15?'warn':'bad', note:'Current vs recommended 25%' },
+    { label:'Debt-to-Income', val:dti+'%', target:'<30%', status:parseFloat(dti)<30?'good':parseFloat(dti)<35?'warn':'bad', note:`EMI ₹${emi.toLocaleString('en-IN')}/mo` },
+    { label:'Monthly Cash Flow', val:'₹'+Math.abs(cashflow).toLocaleString('en-IN'), target:'>₹0', status:cashflow>=0?'good':'bad', note:cashflow>=0?'Positive surplus':'Deficit — critical' },
+    { label:'Emergency Fund Coverage', val:efCoverage+' months', target:'≥6 months', status:parseFloat(efCoverage)>=6?'good':parseFloat(efCoverage)>=3?'warn':'bad', note:`₹${emergency.toLocaleString('en-IN')} saved` },
+    { label:'Financial Health Score', val:finScore+'/100', target:'≥75', status:finScore>=75?'good':finScore>=60?'warn':'bad', note:'Composite calculation' },
+    { label:'Total Monthly Outflow', val:'₹'+totalExp.toLocaleString('en-IN'), target:'<₹'+(income*0.75).toLocaleString('en-IN'), status:totalExp<income*0.75?'good':totalExp<income*0.85?'warn':'bad', note:Math.round((totalExp/income)*100)+'% of income' },
+  ];
+
+  const sc = { good:'green', warn:'amber', bad:'red' };
+  el.innerHTML = metrics.map(m=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-size:13.5px;font-weight:600">${m.label}</div>
+        <div style="font-size:11.5px;color:var(--navy4);margin-top:1px">${m.note}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="font-mono font-bold" style="font-size:15px;color:var(--${m.status==='bad'?'red':m.status==='warn'?'amber':'green'})">${m.val}</div>
+        <div style="font-size:11px;color:var(--navy4)">Target: ${m.target}</div>
+      </div>
+    </div>`).join('');
+
+  // Update state stat
+  const stFin = document.getElementById('st-fin');
+  if(stFin) stFin.textContent = finScore;
+}
+
+function buildFinBarChart() {
+  const el = document.getElementById('finBarChart');
+  if(!el) return;
+  const income = [82,85,85,80,85,85];
+  const exp = [58,62,71,64,70,67];
+  const months = ['Sep','Oct','Nov','Dec','Jan','Feb'];
+  const maxV = Math.max(...income,...exp);
+  const h = 100;
+  el.innerHTML = `<div style="display:flex;gap:8px;align-items:flex-end;height:${h}px;">
+    ${income.map((v,i)=>`
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="display:flex;gap:2px;align-items:flex-end;width:100%;">
+          <div style="flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#059669,#10b981);height:${Math.round((income[i]/maxV)*(h-16))}px;min-height:3px;transition:height .8s"></div>
+          <div style="flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#dc2626,#f87171);height:${Math.round((exp[i]/maxV)*(h-16))}px;min-height:3px;transition:height .8s"></div>
+        </div>
+        <div style="font-size:9px;color:var(--navy4);font-family:'DM Mono',monospace">${months[i]}</div>
+      </div>`).join('')}
+  </div>
+  <div style="display:flex;gap:16px;margin-top:8px;">
+    <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--navy4)"><div style="width:10px;height:10px;border-radius:2px;background:var(--green)"></div>Income</div>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--navy4)"><div style="width:10px;height:10px;border-radius:2px;background:var(--red)"></div>Expenses</div>
+  </div>`;
+}
+
+function buildExpenseBreakdown() {
+  const el = document.getElementById('expenseBreakdown');
+  if(!el) return;
+  const cats = [
+    { name:'Housing/Rent', amt:22000, color:'purple', pct:33 },
+    { name:'EMIs', amt:28500, color:'red', pct:42 },
+    { name:'Food & Dining', amt:12400, color:'amber', pct:18 },
+    { name:'Transport', amt:5800, color:'blue', pct:9 },
+    { name:'Shopping', amt:7200, color:'navy', pct:11 },
+  ];
+  el.innerHTML = cats.map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--${c.color});flex-shrink:0"></div>
+      <div style="flex:1;font-size:13px">${c.name}</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--navy4)">₹${c.amt.toLocaleString('en-IN')}</div>
+      <div style="width:50px;">
+        <div style="height:5px;background:var(--bg2);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${c.pct}%;background:var(--${c.color});border-radius:3px;transition:width .8s"></div>
+        </div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--navy4);width:28px">${c.pct}%</div>
+    </div>`).join('');
+}
+
+async function runFinanceAnalysis() {
+  openAIModal('Financial Intelligence Report');
+  const income = document.getElementById('f-income')?.value||85000;
+  const emi = document.getElementById('f-emi')?.value||28500;
+  const savings = document.getElementById('f-savings')?.value||17600;
+  try {
+    const r = await callLIA(`Generate a comprehensive financial intelligence report. Key inputs: Income ₹${income}/mo, EMIs ₹${emi}/mo (${Math.round((emi/income)*100)}% DTI), Savings ₹${savings}/mo, Emergency fund 2.3 months.
+
+Format:
+FINANCIAL HEALTH VERDICT: [score/100 with one-line diagnosis]
+CRITICAL ISSUES (ranked by severity): [3 items with specific numbers]
+6-MONTH ACTION PLAN: [monthly targets with specific numbers]
+SAVINGS OPTIMIZATION: [2 specific investment recommendations]
+EMI STRATEGY: [specific prepayment recommendation with calculated savings]
+FORECAST: [estimated financial health score in 6 months if plan followed]
+
+Max 200 words. Analytical. Reference actual numbers.`);
+    showAIModal('LIA Financial Intelligence Report', r);
+  } catch(e) {
+    showAIModal('Financial Report', `Financial Health: <strong>68/100</strong> — Debt-heavy, recoverable<br><br><strong>Critical Issues:</strong><br>1. DTI at 33.5% (limit: 30%) — primary risk<br>2. Emergency fund at 2.3 months (target: 6) — vulnerability<br>3. Variable expenses ₹24,400 vs ₹18,000 budget — leakage<br><br><strong>6-Month Plan:</strong> Month 1: Reduce food to ₹8K, save ₹4.4K extra. Month 2: Start prepaying SBI loan ₹3K extra. Month 4: Close personal loan. Month 6: Redirect to emergency fund SIP.<br><br><strong>Forecast:</strong> Following this plan → Financial health score 79/100 in 6 months.`);
+  }
+}
+
+// ══════════════════════════
+// EMI MODULE
+// ══════════════════════════
+function calcPrepay() {
+  const loanEl = document.getElementById('sim-loan');
+  const extraEl = document.getElementById('sim-extra');
+  const resEl = document.getElementById('simResult');
+  if(!loanEl||!extraEl||!resEl) return;
+
+  const extra = parseInt(extraEl.value)||0;
+  const loans = {
+    home: { name:'Home Loan', outstanding:1840000, rate:8.5/1200, emi:18200 },
+    car: { name:'Car Loan', outstanding:420000, rate:9.2/1200, emi:7300 },
+    personal: { name:'Personal Loan', outstanding:200000, rate:12.5/1200, emi:3000 }
+  };
+  const l = loans[loanEl.value];
+  const P = l.outstanding, r = l.rate;
+  const newEMI = l.emi + extra;
+
+  // Months remaining
+  const stdMonths = Math.ceil(Math.log(l.emi/(l.emi - P*r)) / Math.log(1+r));
+  const newMonths = Math.ceil(Math.log(newEMI/(newEMI - P*r)) / Math.log(1+r));
+  const monthsSaved = stdMonths - newMonths;
+
+  const stdInterest = (l.emi * stdMonths) - P;
+  const newInterest = (newEMI * newMonths) - P;
+  const intSaved = stdInterest - newInterest;
+
+  const yr = Math.floor(monthsSaved/12), mo = monthsSaved%12;
+
+  resEl.innerHTML = `<div class="alert alert-green mt12">
+    <div class="alert-icon">💰</div>
+    <div class="alert-body">
+      <div class="alert-title">Impact of ₹${extra.toLocaleString('en-IN')} extra/month</div>
+      <div class="alert-desc">
+        Tenure reduced by <strong>${yr>0?yr+'yr ':''} ${mo>0?mo+'mo':''}</strong>
+        · Interest saved: <strong>₹${Math.round(intSaved/1000)}K</strong>
+        · New payoff: <strong>${newMonths} months</strong>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function runEMIStrategy() {
+  openAIModal('EMI Optimization Strategy');
+  try {
+    const r = await callLIA(`Optimal debt repayment strategy for 3 loans:
+    1. Home Loan ₹18.4L @ 8.5% | EMI ₹18,200 | 16yr4mo
+    2. Car Loan ₹4.2L @ 9.2% | EMI ₹7,300 | 4yr8mo
+    3. Personal Loan ₹2L @ 12.5% | EMI ₹3,000 | 5yr11mo
+    Available surplus: ₹5,000–8,000/month extra
+    
+    Format:
+    STRATEGY: [Avalanche/Snowball/Modified — explain why]
+    PHASE 1 (Now–Month 14): Specific monthly plan with numbers
+    PHASE 2 (Month 15–36): What changes
+    TOTAL INTEREST SAVED: Calculate exactly
+    DEBT-FREE DATE: Estimate
+    
+    Calculate all numbers precisely.`);
+    showAIModal('LIA Debt Optimization Strategy', r);
+  } catch(e) {
+    showAIModal('EMI Strategy', `Strategy: <strong>Modified Avalanche</strong> — target highest rate first but size matters<br><br>Phase 1 (Now–Month 14): Pay ₹6,500 extra on Personal Loan (12.5%). Closes 14 months early. Interest saved: ₹38,400.<br><br>Phase 2 (Month 15 onward): Redirect entire ₹9,500/mo to Home Loan principal. Tenure drops from 16yr4mo → 11yr6mo. Additional savings: ₹4.1L.<br><br>Total interest saved: ₹4,38,400<br>Debt-free date: ~9 years earlier than current trajectory`);
+  }
+}
+
+// ══════════════════════════
+// DECISION SIMULATOR
+// ══════════════════════════
+function loadScenario(s) {
+  const scenarios = {
+    laptop: { q:'Should I buy a ₹1.5 lakh laptop on 12-month EMI?', cost:150000, months:12, reason:'Need for remote work, old laptop failing' },
+    bike: { q:'Should I buy a second-hand bike for ₹80,000?', cost:80000, months:0, reason:'Daily commute, save on Ola/Uber costs' },
+    vacation: { q:'Should I take a ₹50,000 vacation trip?', cost:50000, months:0, reason:'Mental health, have not taken break in 2 years' },
+    course: { q:'Should I invest ₹30,000 in an advanced Data Engineering course?', cost:30000, months:6, reason:'Career advancement, fills skill gap for target role' },
+  };
+  const sc = scenarios[s];
+  if(!sc) return;
+  document.getElementById('sim-question').value = sc.q;
+  document.getElementById('sim-cost').value = sc.cost;
+  document.getElementById('sim-months').value = sc.months;
+  document.getElementById('sim-reason').value = sc.reason;
+  runDecisionSim();
+}
+
+async function runDecisionSim() {
+  const q = document.getElementById('sim-question').value;
+  const cost = parseInt(document.getElementById('sim-cost').value)||0;
+  const months = parseInt(document.getElementById('sim-months').value)||0;
+  const reason = document.getElementById('sim-reason').value;
+
+  const el = document.getElementById('simAnalysisOutput');
+  if(!el) return;
+  el.innerHTML = '<div style="text-align:center;padding:30px"><div class="spinner" style="width:28px;height:28px;margin:0 auto 12px;border-width:2.5px"></div><div style="font-size:13px;color:var(--navy4)">LIA is modeling impact…</div></div>';
+
+  // Show impact tiles
+  const detailEl = document.getElementById('simDetailResult');
+  const tilesEl = document.getElementById('simImpactTiles');
+  const verdictEl = document.getElementById('simAIVerdict');
+
+  try {
+    const emiAmt = months>0 ? Math.ceil(cost/months * 1.08) : 0;
+    const r = await callLIA(
+      `Decision analysis: "${q}"
+      Cost: ₹${cost.toLocaleString('en-IN')} | EMI: ₹${emiAmt}/mo for ${months} months | Reason: ${reason}
+      
+      User financial context: Income ₹85K, current EMI ₹28,500 (33.5% DTI), savings ₹17.6K/mo, emergency fund 2.3 months.
+      
+      Format EXACTLY:
+      VERDICT: [BUY / WAIT / DON'T BUY] — [one-line reason]
+      
+      IMPACT ANALYSIS:
+      • Savings rate impact: [before → after + specific number change]
+      • Emergency fund impact: [months coverage change]
+      • DTI impact: [percentage change if EMI purchase]
+      • Life score impact: [estimated point change]
+      
+      RECOMMENDATION: [2–3 sentence strategic advice with specific alternative if declining]
+      
+      BEST CASE scenario: [if they buy]
+      WORST CASE scenario: [if they buy during financial stress]`,
+      `Decision context: ${reason}`
+    );
+    el.innerHTML = `<div class="lia-box"><div class="lia-box-header"><div class="lia-chip">⚙ LIA Decision Analysis</div></div><div class="lia-box-text">${fmt(r)}</div></div>`;
+
+    // Computed tiles
+    if(tilesEl && detailEl) {
+      const newSavings = Math.max(0, 17600 - emiAmt);
+      const savImpact = emiAmt>0 ? `-₹${emiAmt.toLocaleString('en-IN')}/mo` : `-₹${Math.round(cost/6).toLocaleString('en-IN')}/mo (avg)`;
+      const newDTI = months>0 ? ((28500+emiAmt)/85000*100).toFixed(1) : '33.5';
+      const efMonths = months>0 ? '2.3' : ((140000-Math.min(cost,30000))/67400).toFixed(1);
+      tilesEl.innerHTML = `
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--red)"></div><div class="stat-label">Savings Impact</div><div class="stat-value" style="font-size:20px;color:var(--red)">${savImpact}</div><div class="stat-sub">Monthly reduction</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--amber)"></div><div class="stat-label">New DTI</div><div class="stat-value" style="font-size:20px;color:var(--amber)">${newDTI}%</div><div class="stat-sub">${parseFloat(newDTI)>35?'Above safe limit':'Within range'}</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--blue)"></div><div class="stat-label">Emergency Fund</div><div class="stat-value" style="font-size:20px;color:var(--blue)">${efMonths} mo</div><div class="stat-sub">Coverage remaining</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--purple)"></div><div class="stat-label">Life Score Impact</div><div class="stat-value" style="font-size:20px;color:var(--purple)">${emiAmt>5000?'-3 pts':'-1 pt'}</div><div class="stat-sub">Estimated change</div></div>`;
+      detailEl.classList.add('show');
+    }
+  } catch(e) {
+    const emiAmt = months>0 ? Math.ceil(cost/months * 1.08) : 0;
+    const verdict = cost>100000 && 28500+emiAmt > 85000*0.35 ? 'WAIT' : cost<50000 ? 'BUY' : 'WAIT';
+    el.innerHTML = `<div class="lia-box"><div class="lia-box-header"><div class="lia-chip">⚙ LIA Decision Analysis</div></div><div class="lia-box-text">
+      <strong>Verdict: ${verdict}</strong><br><br>
+      ${verdict==='WAIT'?`Adding ₹${emiAmt.toLocaleString('en-IN')}/mo EMI would push DTI to ${((28500+emiAmt)/85000*100).toFixed(1)}% — above the 35% safety threshold. <strong>Wait 3 months</strong> until personal loan is partially paid down. Alternative: Buy refurbished for ₹70K (no EMI needed from current savings)`:
+      verdict==='BUY'?`At ₹${cost.toLocaleString('en-IN')}, this is a <strong>justified investment</strong> given your career context. It directly supports the Cloud Engineer roadmap and has positive ROI within ${Math.round(cost/5000)} months via career leverage. Impact on emergency fund: -0.2 months coverage.`:
+      'Analysis suggests waiting 2–3 months for improved financial position.'}
+    </div></div>`;
+  }
+}
+
+// ══════════════════════════
+// FUTURE PROJECTION
+// ══════════════════════════
+async function runProjection(months) {
+  const el = document.getElementById('projectionText');
+  const tiles = document.getElementById('projTiles');
+  const chartEl = document.getElementById('projChart');
+  const riskEl = document.getElementById('riskCalendar');
+  const goalEl = document.getElementById('goalForecast');
+  if(!el) return;
+
+  el.innerHTML = '<span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>';
+  if(tiles) tiles.style.display='none';
+
+  try {
+    const r = await callLIA(
+      `Project my life trajectory over the next ${months} months. Base state: income ₹85K, savings ₹17.6K/mo, emergency fund ₹1.4L (2.3mo), debts ₹24.6L, AWS cert 40% done.
+      
+      Format:
+      FINANCIAL TRAJECTORY:
+      • Month 3: [savings balance, emergency fund status]
+      • Month 6: [savings balance, major change]
+      ${months>=12?'• Month 12: [financial position]':''}
+      
+      RISK SPIKES: [2 specific months where risk peaks and why]
+      
+      GOAL COMPLETION LIKELIHOOD: [percentage for each active goal]
+      
+      HEADLINE FORECAST: [one-sentence summary of where you'll be in ${months} months]
+      
+      Use specific numbers. Calculate compound savings.`
+    );
+    el.innerHTML = fmt(r);
+
+    // Build tiles
+    if(tiles) {
+      const finalSavings = 140000 + (17600 * months);
+      const efMonths = (finalSavings / 67400).toFixed(1);
+      tiles.innerHTML = `
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--green)"></div><div class="stat-label">Projected Savings</div><div class="stat-value text-green" style="font-size:22px">₹${Math.round(finalSavings/1000)}K</div><div class="stat-sub up">In ${months} months</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--blue)"></div><div class="stat-label">Emergency Fund</div><div class="stat-value" style="font-size:22px;color:var(--blue)">${efMonths} mo</div><div class="stat-sub">Target: 6 months</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--amber)"></div><div class="stat-label">Debt Reduction</div><div class="stat-value" style="font-size:22px;color:var(--amber)">₹${Math.round(28500*months/100000)*100000/1000}L</div><div class="stat-sub">Principal paid</div></div>
+        <div class="stat-tile"><div class="stat-tile-accent" style="background:var(--purple)"></div><div class="stat-label">Life Score Forecast</div><div class="stat-value" style="font-size:22px;color:var(--purple)">${Math.min(74+Math.round(months/2),92)}</div><div class="stat-sub up">Projected improvement</div></div>`;
+      tiles.style.display='grid';
+    }
+
+    // Chart
+    if(chartEl) buildProjChart(chartEl, months);
+
+    // Risk calendar
+    if(riskEl) buildRiskCalendar(riskEl, months);
+
+    // Goal forecast
+    if(goalEl) buildGoalForecast(goalEl, months);
+
+  } catch(e) {
+    el.innerHTML = months===6 ?
+      '<strong>6-Month Forecast:</strong><br><br>• Month 2: Personal loan payment accelerates, DTI improving<br>• Month 3: AWS certification complete — job search begins. Savings: ₹1.93L<br>• Month 4: Risk spike — 2 insurance renewals + car service<br>• Month 6: Emergency fund reaches 3.8 months coverage. Salary increase likely (10–15% with new cert)' :
+      '<strong>12-Month Forecast:</strong><br><br>• Month 3: AWS cert complete. Salary negotiation window opens<br>• Month 6: Personal loan closed. ₹3K/mo freed for home loan prepayment<br>• Month 8: Emergency fund at 4.5 months — nearing safety threshold<br>• Month 12: Financial health score ~78. Life score ~83. Debt-to-income ~28% (below threshold for first time)';
+  }
+}
+
+function buildProjChart(el, months) {
+  const points = Array.from({length:months+1},(_,i)=>140000+(17600*i));
+  const max = Math.max(...points);
+  const svgW = 400; const svgH = 100;
+  const pts = points.map((v,i)=>{
+    const x = (i/months)*(svgW-20)+10;
+    const y = svgH - (v/max)*(svgH-20) - 10;
+    return `${x},${y}`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${svgW} ${svgH}" style="width:100%;height:100%">
+    <polyline points="${pts.join(' ')}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <polyline points="${pts.join(' ')} ${svgW-10},${svgH} 10,${svgH}" fill="rgba(5,150,105,0.08)" stroke="none"/>
+    ${points.map((v,i)=>{
+      const x=(i/months)*(svgW-20)+10, y=svgH-(v/max)*(svgH-20)-10;
+      return `<circle cx="${x}" cy="${y}" r="3" fill="var(--green)"/>`;
+    }).join('')}
+    <text x="10" y="${svgH-3}" font-size="9" fill="var(--navy4)" font-family="DM Mono">Now</text>
+    <text x="${svgW-30}" y="${svgH-3}" font-size="9" fill="var(--navy4)" font-family="DM Mono">${months}mo</text>
+  </svg>`;
+}
+
+function buildRiskCalendar(el, months) {
+  const risks = [
+    { month:1, level:'moderate', reason:'HDFC EMI + Electricity overdue' },
+    { month:3, level:'high', reason:'Insurance renewal + ITR filing deadline' },
+    { month:5, level:'low', reason:'AWS cert exam + potential job applications' },
+    { month:6, level:'moderate', reason:'Vehicle insurance, mid-year review' },
+  ].filter(r=>r.month<=months);
+  el.innerHTML = risks.map(r=>`
+    <div class="alert alert-${r.level==='high'?'red':r.level==='moderate'?'amber':'green'} mb8">
+      <div class="alert-icon">${r.level==='high'?'🚨':r.level==='moderate'?'⚠️':'✅'}</div>
+      <div class="alert-body"><div class="alert-title">Month ${r.month} — ${r.level.toUpperCase()} Risk</div><div class="alert-desc">${r.reason}</div></div>
+    </div>`).join('');
+}
+
+function buildGoalForecast(el, months) {
+  const goals = [
+    { name:'AWS Certification', prob: months>=2?92:65, color:'green' },
+    { name:'Emergency Fund ₹5L', prob: months>=12?78:months>=6?45:28, color:'blue' },
+    { name:'Fitness (–8kg)', prob: months>=4?88:60, color:'green' },
+  ];
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+    ${goals.map(g=>`
+      <div style="text-align:center;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);">
+        <div style="font-size:32px;font-weight:800;color:var(--${g.color});letter-spacing:-1px">${g.prob}%</div>
+        <div style="font-size:12px;color:var(--navy4);margin-top:4px;">${g.name}</div>
+        <div style="font-size:11px;color:var(--${g.prob>75?'green':'amber'});margin-top:4px;font-weight:600">${g.prob>75?'High probability':'Needs effort'}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ══════════════════════════
+// DOCUMENTS
+// ══════════════════════════
+function renderDocs() {
+  const finEl = document.getElementById('docFinancial');
+  const persEl = document.getElementById('docPersonal');
+  const catEl = document.getElementById('docCategories');
+  if(!finEl||!persEl) return;
+
+  const finDocs = STATE.docs.filter(d=>d.cat==='Financial');
+  const persDocs = STATE.docs.filter(d=>d.cat==='Identity'||d.cat==='Insurance');
+
+  const docRow = (d) => `
+    <div class="bill-item">
+      <div class="bill-icon-wrap" style="background:${d.urgent?'var(--red-light)':'var(--blue-light)'};font-size:20px">${d.cat==='Financial'?'📄':d.cat==='Identity'?'🪪':'📋'}</div>
+      <div class="bill-info">
+        <div class="bill-name">${d.name}</div>
+        <div class="bill-details">${d.cat} · ${d.size} · ${d.date}</div>
+      </div>
+      <div class="bill-right">
+        <span class="badge badge-${d.urgent?'red':'green'}">${d.urgent?'Action needed':'OK'}</span>
+        ${d.expiry?`<div style="font-size:11px;color:var(--red);margin-top:4px">Exp: ${d.expiry}</div>`:''}
+      </div>
+    </div>`;
+
+  finEl.innerHTML = finDocs.map(docRow).join('');
+  persEl.innerHTML = persDocs.map(docRow).join('');
+
+  if(catEl) {
+    const cats = [
+      { icon:'💰', name:'Financial', count:8, color:'green' },
+      { icon:'🪪', name:'Identity', count:4, color:'blue' },
+      { icon:'🏥', name:'Medical', count:5, color:'red' },
+      { icon:'📋', name:'Legal/Insurance', count:4, color:'amber' },
+      { icon:'🏠', name:'Property', count:3, color:'purple' },
+    ];
+    catEl.innerHTML = cats.map(c=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13.5px">${c.icon} ${c.name}</div>
+        <span class="badge badge-${c.color}">${c.count}</span>
+      </div>`).join('');
+  }
+}
+
+function addDocFromModal() {
+  const name = document.getElementById('md-name').value;
+  if(!name) return;
+  STATE.docs.push({ name, cat:document.getElementById('md-cat').value, size:'0.5 MB', date:'Just now', expiry:document.getElementById('md-expiry').value||null, urgent:false });
+  closeModal('docModal');
+  if(document.getElementById('view-documents').classList.contains('active')) renderDocs();
+}
+
+// ══════════════════════════
+// LIA CHAT
+// ══════════════════════════
+let chatOpen = false;
+const chatMsgHistory = [];
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chatWindow').classList.toggle('open', chatOpen);
+  if(chatOpen) setTimeout(()=>document.getElementById('chatInput').focus(), 100);
+}
+
+function addMsgUI(role, text) {
+  const wrap = document.getElementById('chatMsgs');
+  if(!wrap) return;
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const avaHtml = role==='lia' ? '<div class="msg-ava">L</div>' : '';
+  div.innerHTML = `${avaHtml}<div class="msg-bubble">${text}</div>`;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+  return div;
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  addMsgUI('user', msg);
+  chatMsgHistory.push({ role:'user', content:msg });
+
+  const typingEl = addMsgUI('lia', '<span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:SYSTEM_PROMPT,
+        messages:chatMsgHistory.slice(-10)
+      })
+    });
+    const d = await res.json();
+    const reply = d.content?.map(c=>c.text||'').join('') || 'Let me analyze that.';
+    typingEl.querySelector('.msg-bubble').innerHTML = fmt(reply);
+    chatMsgHistory.push({ role:'assistant', content:reply });
+  } catch(e) {
+    // Intelligent fallbacks
+    const lower = msg.toLowerCase();
+    let fb = 'Based on your profile: your most urgent action is paying the overdue electricity bill (₹1,840), then focusing on AWS Module 4 due March 10.';
+    if(lower.includes('emi')||lower.includes('loan')) fb = 'Your Personal Loan at 12.5% is the most expensive debt. Paying ₹6,500 extra/month closes it 58 months early and saves ₹38,400 in interest. Start here before any home loan prepayment.';
+    else if(lower.includes('budget')||lower.includes('spend')||lower.includes('money')) fb = 'Your variable expenses are ₹6,400 above target. Food & dining is the primary leakage point at ₹12,400 vs ₹8,000 budget. Cutting this single category improves your savings rate from 20.7% to 25.9%.';
+    else if(lower.includes('goal')||lower.includes('aws')||lower.includes('certif')) fb = 'AWS certification is at 40% with 48 days remaining. You need to complete 1.5 modules/week. At your current pace of 0.8/week, you\'ll finish 3 weeks late. Increase daily study from 45min to 90min to recover.';
+    else if(lower.includes('score')||lower.includes('life')) fb = 'Your Life Score of 74 is held back by: Finance (68) and Organization (62). The fastest path to 85+ is: (1) Upload 6 missing documents (+4 pts), (2) Set food budget at ₹8K (+3 pts), (3) Complete AWS cert (+3 pts).';
+    else if(lower.includes('invest')||lower.includes('save')) fb = 'After covering your ₹1.4L emergency fund shortfall, the optimal sequence is: (1) Extra ₹3K/mo to SBI personal loan, (2) Rest to liquid mutual fund. Your target is 6-month emergency coverage (₹4L) — at current ₹17.6K savings, you reach it in 14 months without changes, or 9 months if personal loan is cleared.';
+    typingEl.querySelector('.msg-bubble').innerHTML = fb;
+    chatMsgHistory.push({ role:'assistant', content:fb });
+  }
+}
+
+// ══════════════════════════
+// MODAL SYSTEM
+// ══════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openTaskModal() { openModal('taskModal'); }
+function openGoalModal() { openModal('goalModal'); }
+function openDocModal() { openModal('docModal'); }
+
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+function openAIModal(title) {
+  document.getElementById('aiModalTitle').textContent = title;
+  document.getElementById('aiModalBody').innerHTML = `
+    <div style="text-align:center;padding:50px 0">
+      <div class="spinner" style="width:40px;height:40px;border-width:3px;margin:0 auto 16px;"></div>
+      <div style="font-size:15px;font-weight:700;color:var(--navy3)">LIA is analyzing…</div>
+      <div style="font-size:13px;color:var(--navy4);margin-top:6px">Applying strategic reasoning to your data</div>
+    </div>`;
+  openModal('aiModal');
+}
+
+function showAIModal(title, text) {
+  document.getElementById('aiModalTitle').textContent = title;
+  document.getElementById('aiModalBody').innerHTML = `
+    <div class="lia-box" style="margin-bottom:0">
+      <div class="lia-box-header"><div class="lia-chip">⚡ LIA Intelligence Report</div></div>
+      <div class="lia-box-text" style="line-height:1.78">${fmt(text)}</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('aiModal')">Close</button>
+    </div>`;
+}
+
+// ══════════════════════════
+// NOTIFICATIONS
+// ══════════════════════════
+let notifOpen = false;
+function toggleNotif() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open', notifOpen);
+}
+function closeNotif() {
+  notifOpen = false;
+  document.getElementById('notifPanel').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const np = document.getElementById('notifPanel');
+  if(notifOpen && np && !np.contains(e.target) && !e.target.closest('.icon-btn')) closeNotif();
+});
+
+// ══════════════════════════
+// DASHBOARD QUICK ACTIONS
+// ══════════════════════════
+async function runFocusBriefing() {
+  openAIModal('Today\'s Focus Briefing — LIA');
+  try {
+    const r = await callLIA(
+      `Give Aditya a precise "What to focus on today" briefing. 
+      Format:
+      TOP PRIORITY (Do first): [specific task + why it's #1 today]
+      SECOND PRIORITY: [task + time estimate]
+      THIRD PRIORITY: [task]
+      AVOID TODAY: [1–2 things to defer]
+      END-OF-DAY METRIC: [one number to track success today]
+      Max 80 words. No preamble.`
+    );
+    showAIModal('Today\'s Focus Brief', r);
+  } catch(e) {
+    showAIModal('Today\'s Focus', `<strong>Priority 1:</strong> Pay electricity bill online — overdue, penalty accruing (15 min)<br><strong>Priority 2:</strong> AWS Module 4 study session (90 min) — cert is at risk<br><strong>Priority 3:</strong> Confirm HDFC EMI auto-debit for Feb 28 (5 min)<br><strong>Defer today:</strong> LinkedIn update, reading<br><strong>End-of-day metric:</strong> AWS progress: 42% or above`);
+  }
+}
+
+async function runFullAnalysis() {
+  openAIModal('Full Life Analysis — LIA Strategic Report');
+  try {
+    const r = await callLIA(
+      `Perform a complete life analysis. Cover ALL dimensions:
+      
+      OVERALL ASSESSMENT: [2 sentence summary of current life state]
+      
+      FINANCIAL SITUATION: [current state, trend, 1 critical action]
+      CAREER TRAJECTORY: [current state, risk, recommended move]
+      GOAL HEALTH: [which goals are on/off track and why]
+      STRESS VECTORS: [what's creating most cognitive load]
+      
+      STRATEGIC PRIORITIES (ranked 1–5): [with specific actions and timelines]
+      
+      90-DAY TRANSFORMATION PLAN: [3 phases, specific actions per phase]
+      
+      LIFE SCORE FORECAST: [expected score in 90 days if plan followed]
+      
+      Be clinical, analytical, and specific. 250 words max.`
+    );
+    showAIModal('Full Life Analysis — LIA', r);
+  } catch(e) {
+    showAIModal('Full Life Analysis', `<strong>Overall:</strong> You're in a "stretched but recoverable" state. Strong goal execution habits are being undermined by financial leakage and organizational gaps.<br><br><strong>Finance:</strong> DTI at 33.5% is the primary systemic risk. Without intervention, emergency fund won't reach 6-month coverage for 14+ months.<br><br><strong>Career:</strong> AWS cert trajectory needs correction — 1.5 modules/week from today. Without it, job transition delayed 6–8 months.<br><br><strong>Strategic Priorities:</strong><br>1. Personal loan prepayment (highest interest, immediate ROI)<br>2. AWS cert completion (career income multiplier)<br>3. Document organization (reduces cognitive overhead)<br>4. Food budget control (most impactful short-term change)<br>5. Emergency fund SIP setup<br><br><strong>90-Day Forecast:</strong> If followed → Life Score ~83, Financial Health ~75, burnout risk drops to 25%.`);
+  }
+}
+
+// ══════════════════════════
+// UTILITY FUNCTIONS
+// ══════════════════════════
+function isDue(dateStr) {
+  if(!dateStr) return false;
+  return new Date(dateStr) <= new Date();
+}
+function formatDate(dateStr) {
+  if(!dateStr) return 'No date';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ══════════════════════════
+// INITIAL SETUP
+// ══════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize progress bars animation
+  setTimeout(() => {
+    document.querySelectorAll('.prog-fill[data-w]').forEach(f => {
+      f.style.width = f.dataset.w;
+    });
+  }, 300);
+
+  // Dashboard init
+  initDashboard();
+});
+
+// Animate life score on page load
+setTimeout(() => {
+  const arc = document.getElementById('lifeScoreArc');
+  if(arc) {
+    const circ = 2*Math.PI*76;
+    arc.style.strokeDasharray = `${(74/100)*circ} ${circ}`;
+  }
+}, 500);
+
+</script>
+</body>
+</html>
