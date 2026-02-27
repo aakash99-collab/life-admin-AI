@@ -1267,8 +1267,8 @@ body {
       <span class="badge">4</span>
     </div>
     <div class="user-chip">
-      <div class="user-ava">AK</div>
-      <span class="user-name">Aditya Kumar</span>
+      <div class="user-ava" data-userinitials>?</div>
+      <span class="user-name" data-username>User</span>
     </div>
   </div>
 </div>
@@ -1288,7 +1288,7 @@ body {
     <div class="dash-hero-top">
       <div class="dash-hero-left">
         <div class="dash-greeting">Good <span id="timeOfDay">morning</span>, welcome back</div>
-        <div class="dash-name">Aditya Kumar</div>
+        <div class="dash-name" data-username>User</div>
         <div class="dash-date" id="fullDate">Loading date…</div>
       </div>
       <div class="dash-score-area">
@@ -2200,6 +2200,31 @@ body {
 </div><!-- /main -->
 
 <!-- ═════════════════════════════════════════════
+     NAME CAPTURE OVERLAY (first load only)
+═════════════════════════════════════════════ -->
+<div class="overlay" id="nameOverlay" style="z-index:300;">
+  <div class="modal" style="max-width:420px;text-align:center;">
+    <div class="modal-body" style="padding:36px 32px;">
+      <div style="font-size:40px;margin-bottom:16px;">👋</div>
+      <div style="font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-0.5px;margin-bottom:8px;">Welcome to Life Admin AI</div>
+      <div style="font-size:13.5px;color:var(--navy4);margin-bottom:24px;line-height:1.6;">Your personal Life Operating System powered by LIA. Let's start by setting up your profile.</div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Your Full Name</label>
+        <input class="form-input" id="nameInput" placeholder="e.g. Rahul Sharma" autofocus style="font-size:15px;padding:12px 14px;"
+          onkeydown="if(event.key==='Enter')saveName()">
+      </div>
+      <div class="form-group" style="text-align:left;">
+        <label class="form-label">Your Role / Status <span style="color:var(--navy4);font-weight:400">(optional)</span></label>
+        <input class="form-input" id="roleInput" placeholder="e.g. Software Engineer, Student, Freelancer">
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px;justify-content:center;" onclick="saveName()">
+        Get Started →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════
      NOTIFICATION PANEL
 ═════════════════════════════════════════════ -->
 <div class="notif-panel" id="notifPanel">
@@ -2232,7 +2257,7 @@ body {
     <div class="chat-msgs" id="chatMsgs">
       <div class="msg lia">
         <div class="msg-ava">L</div>
-        <div class="msg-bubble">Hi Aditya 👋 I'm <strong>LIA</strong> — your Life Intelligence Assistant. I have full context of your finances, goals, tasks, and life score. Ask me anything — I'll give you analytical, specific answers based on your actual data.</div>
+        <div class="msg-bubble" id="chatGreetingBubble">Hi 👋 I'm <strong>LIA</strong> — your Life Intelligence Assistant. I have full context of your finances, goals, tasks, and life score. Ask me anything.</div>
       </div>
     </div>
     <div class="chat-input-area">
@@ -2333,10 +2358,38 @@ body {
 'use strict';
 
 // ══════════════════════════
+// PERSISTENCE HELPERS
+// ══════════════════════════
+const LS = {
+  get: (k, def) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch(e) { return def; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+};
+
+// Default seed data (used only when no localStorage data exists)
+const DEFAULT_TASKS = [
+  { id:1, title:'File Income Tax Return (ITR)', due:'2025-03-31', prio:'critical', done:false, type:'Deadline' },
+  { id:2, title:'HDFC Home Loan EMI', due:'2025-02-28', prio:'critical', done:false, type:'EMI' },
+  { id:3, title:'Renew Health Insurance Policy', due:'2025-03-15', prio:'critical', done:false, type:'Deadline' },
+  { id:4, title:'AWS Certification — Module 4', due:'2025-03-10', prio:'strategic', done:false, type:'Goal' },
+  { id:5, title:'SBI Personal Loan EMI', due:'2025-03-05', prio:'strategic', done:false, type:'EMI' },
+  { id:6, title:'Gym session — 4x this week', due:'2025-03-02', prio:'routine', done:true, type:'Health' },
+  { id:7, title:'Update LinkedIn profile', due:'2025-03-20', prio:'routine', done:false, type:'Career' },
+  { id:9, title:'Pay electricity bill (overdue)', due:'2025-02-26', prio:'critical', done:false, type:'Bill' },
+];
+const DEFAULT_GOALS = [
+  { id:1, title:'AWS Cloud Certification', category:'Career', progress:40, deadline:'2025-04-15', status:'at-risk' },
+  { id:2, title:'Emergency Fund ₹5 Lakh', category:'Financial', progress:28, deadline:'2025-12-31', status:'on-track' },
+  { id:3, title:'Fitness: Lose 8kg', category:'Health', progress:55, deadline:'2025-06-30', status:'on-track' },
+];
+
+// ══════════════════════════
 // APP STATE
 // ══════════════════════════
 const STATE = {
-  user: { name: 'Aditya Kumar', role: 'Software Engineer', exp: 3, location: 'Bengaluru' },
+  user: {
+    name: LS.get('lia_username', ''),
+    role: LS.get('lia_userrole', 'Professional')
+  },
   finance: {
     income: 85000, fixed: 32000, variable: 24400,
     emi: 28500, savings: 17600, emergency: 140000,
@@ -2346,22 +2399,8 @@ const STATE = {
       { name:'Personal Loan', bank:'SBI', outstanding:200000, rate:12.5, emi:3000, months:71 }
     ]
   },
-  tasks: [
-    { id:1, title:'File Income Tax Return (ITR)', due:'2025-03-31', prio:'critical', done:false, type:'Deadline' },
-    { id:2, title:'HDFC Home Loan EMI — Feb', due:'2025-02-28', prio:'critical', done:false, type:'EMI' },
-    { id:3, title:'Renew Health Insurance Policy', due:'2025-03-15', prio:'critical', done:false, type:'Deadline' },
-    { id:4, title:'AWS Certification — Module 4 (EC2)', due:'2025-03-10', prio:'strategic', done:false, type:'Goal' },
-    { id:5, title:'SBI Personal Loan EMI', due:'2025-03-05', prio:'strategic', done:false, type:'EMI' },
-    { id:6, title:'Gym session — 4x this week', due:'2025-03-02', prio:'routine', done:true, type:'Health' },
-    { id:7, title:'Update LinkedIn profile', due:'2025-03-20', prio:'routine', done:false, type:'Career' },
-    { id:8, title:'Read Atomic Habits — Chapter 8', due:'2025-03-05', prio:'routine', done:false, type:'Personal' },
-    { id:9, title:'Pay electricity bill (overdue)', due:'2025-02-26', prio:'critical', done:false, type:'Bill' },
-  ],
-  goals: [
-    { id:1, title:'AWS Cloud Certification', category:'Career', progress:40, deadline:'2025-04-15', status:'at-risk' },
-    { id:2, title:'Emergency Fund ₹5 Lakh', category:'Financial', progress:28, deadline:'2025-12-31', status:'on-track' },
-    { id:3, title:'Fitness: Lose 8kg', category:'Health', progress:55, deadline:'2025-06-30', status:'on-track' },
-  ],
+  tasks: LS.get('lia_tasks', DEFAULT_TASKS),
+  goals: LS.get('lia_goals', DEFAULT_GOALS),
   docs: [
     { name:'ITR Filing 2023–24.pdf', cat:'Financial', size:'2.4 MB', date:'Jan 15', expiry:'Mar 31', urgent:true },
     { name:'HDFC Home Loan Agreement.pdf', cat:'Financial', size:'1.8 MB', date:'Dec 2', expiry:null, urgent:false },
@@ -2374,6 +2413,55 @@ const STATE = {
     Finance: 68, Career: 65, Productivity: 79, Organization: 62, PersonalGrowth: 82, Stability: 71
   }
 };
+
+// ── Save tasks & goals to localStorage
+function savePersist() {
+  LS.set('lia_tasks', STATE.tasks);
+  LS.set('lia_goals', STATE.goals);
+}
+
+// ── Convenience: get current user name with fallback
+function userName() { return STATE.user.name || 'there'; }
+function userFirstName() { return (STATE.user.name || 'User').split(' ')[0]; }
+
+// ── Save name and boot app
+function saveName() {
+  const n = (document.getElementById('nameInput').value || '').trim();
+  if(!n) { document.getElementById('nameInput').style.border='1.5px solid var(--red)'; return; }
+  const r = (document.getElementById('roleInput').value || '').trim() || 'Professional';
+  STATE.user.name = n;
+  STATE.user.role = r;
+  LS.set('lia_username', n);
+  LS.set('lia_userrole', r);
+  document.getElementById('nameOverlay').classList.remove('open');
+  applyUserName();
+  initDashboard();
+  setTimeout(() => {
+    const arc = document.getElementById('lifeScoreArc');
+    if(arc) { const c=2*Math.PI*76; arc.style.strokeDasharray=`${(74/100)*c} ${c}`; }
+  }, 500);
+}
+
+// ── Push name into all DOM placeholders
+function applyUserName() {
+  const n = STATE.user.name;
+  if(!n) return;
+  const fn = userFirstName();
+  document.querySelectorAll('[data-username]').forEach(el => el.textContent = n);
+  document.querySelectorAll('[data-userfirst]').forEach(el => el.textContent = fn);
+  // topbar
+  const chip = document.querySelector('.user-name');
+  if(chip) chip.textContent = n;
+  const ava = document.querySelector('[data-userinitials]');
+  if(ava) ava.textContent = n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  // chat greeting
+  const greet = document.getElementById('chatGreetingBubble');
+  if(greet) greet.innerHTML = `Hi ${fn} 👋 I'm <strong>LIA</strong> — your Life Intelligence Assistant. I have full context of your finances, goals, and tasks. Ask me anything.`;
+  // Animate progress bars that already exist on page
+  setTimeout(() => {
+    document.querySelectorAll('.prog-fill[data-w]').forEach(f => { f.style.width = f.dataset.w; });
+  }, 200);
+}
 
 // ══════════════════════════
 // CLOCK + DATE
@@ -2451,50 +2539,51 @@ function onViewEnter(id) {
 // ══════════════════════════
 // CLAUDE API
 // ══════════════════════════
-const SYSTEM_PROMPT = `You are LIA (Life Intelligence Assistant), an advanced AI embedded in Aditya Kumar's personal Life Operating System.
+// ── Dynamic system prompt using live user name
+function getSystemPrompt() {
+  const n = STATE.user.name || 'the user';
+  const r = STATE.user.role || 'Professional';
+  const critTasks = STATE.tasks.filter(t=>!t.done&&t.prio==='critical').map(t=>t.title).join(', ')||'none';
+  const goalsSummary = STATE.goals.map(g=>`${g.title} ${g.progress}% (${g.status})`).join(', ');
+  return `You are LIA (Life Intelligence Assistant), an advanced AI embedded in ${n}'s personal Life Operating System.
 
 USER PROFILE:
-- Name: Aditya Kumar, 28, Software Engineer (3yr exp), Bengaluru
+- Name: ${n}, Role: ${r}
 - Monthly Income: ₹85,000 | Take-home after tax
 
 FINANCIAL DATA:
 - Fixed Expenses: ₹32,000/mo | Variable: ₹24,400/mo (34% over budget) | EMIs: ₹28,500/mo
 - Savings: ₹17,600/mo (20.7% rate) | Emergency Fund: ₹1,40,000 (2.3 months coverage)
-- Home Loan: ₹18.4L @ 8.5% (EMI ₹18,200, 16yr4mo left)
-- Car Loan: ₹4.2L @ 9.2% (EMI ₹7,300, 4yr8mo left)
-- Personal Loan: ₹2L @ 12.5% (EMI ₹3,000, 5yr11mo left)
+- Home Loan: ₹18.4L @ 8.5% | Car Loan: ₹4.2L @ 9.2% | Personal Loan: ₹2L @ 12.5%
 - Debt-to-income: 33.5% | Financial Health: 68/100
 
-TASKS & DEADLINES:
-- CRITICAL: ITR due Mar 31, HDFC EMI Feb 28, Health Insurance renewal Mar 15, Electricity bill overdue
-- STRATEGIC: AWS Module 4 (Mar 10), SBI EMI (Mar 5)
-
-GOALS:
-- AWS Cloud Certification: 40% done, due Apr 15 — AT RISK (needs 1.5 modules/week)
-- Emergency Fund ₹5L: 28% done (₹1.4L saved), due Dec 31
-- Fitness (lose 8kg): 55% done, due Jun 30 — ON TRACK
-
-LIFE METRICS:
-- Life Score: 74/100 | Burnout Risk: 42% (Moderate)
-- Radar: Finance 68, Career 65, Productivity 79, Organization 62, PersonalGrowth 82, Stability 71
+ACTIVE TASKS (critical): ${critTasks}
+ACTIVE GOALS: ${goalsSummary}
+LIFE METRICS: Life Score 74/100 | Burnout Risk 42%
+RADAR: Finance 68, Career 65, Productivity 79, Organization 62, PersonalGrowth 82, Stability 71
 
 BEHAVIORAL RULES:
-1. Never give generic motivational responses
-2. Always reference specific numbers from the user's actual data
-3. Provide cause-effect reasoning with logic chains
-4. When asked about improvements, prioritize by ROI and urgency
+1. Address the user as ${n.split(' ')[0]} when appropriate
+2. Never give generic motivational responses
+3. Always reference specific numbers from the user's actual data
+4. Provide cause-effect reasoning with logic chains
 5. Use structured responses: situation → analysis → specific action → expected outcome
 6. Be concise but analytical. Max 150 words unless asked for full report.
-7. Calculate actual numbers when relevant (interest savings, timeline changes, score impact)`;
+7. Calculate actual numbers when relevant (interest savings, timeline changes, score impact)
+8. For greetings/small talk: be warm but pivot quickly to a relevant life insight`;
+}
+// Keep backward-compat alias
+const SYSTEM_PROMPT = null; // replaced by getSystemPrompt()
 
 async function callLIA(userMsg, context = '') {
+  const sys = getSystemPrompt() + (context ? '\n\nADDITIONAL CONTEXT:\n' + context : '');
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1000,
-      system: SYSTEM_PROMPT + (context ? '\n\nADDITIONAL CONTEXT:\n' + context : ''),
+      system: sys,
       messages: [{ role: 'user', content: userMsg }]
     })
   });
@@ -2558,23 +2647,9 @@ function renderDashTasks() {
   const el = document.getElementById('dashTaskList');
   if(!el) return;
   const topTasks = STATE.tasks.filter(t=>!t.done).slice(0,4);
-  el.innerHTML = topTasks.map(t => `
-    <div class="task-row ${t.done?'done':''}">
-      <div class="task-check ${t.done?'checked':''}" onclick="toggleTaskId(${t.id})">
-        ${t.done?'✓':''}
-      </div>
-      <div class="task-body">
-        <div class="task-title ${t.done?'strikethrough':''}">${t.title}</div>
-        <div class="task-meta">
-          <span class="badge badge-${t.prio==='critical'?'red':t.prio==='strategic'?'amber':'navy'}">${t.prio}</span>
-          <span class="task-due ${isDue(t.due)?'red':''}">
-            ${isDue(t.due)?'⚠ Overdue':'Due'}: ${formatDate(t.due)}
-          </span>
-          <span class="badge badge-navy">${t.type}</span>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  el.innerHTML = topTasks.length
+    ? topTasks.map(t => taskRowHTML(t, false)).join('')
+    : '<div style="font-size:13px;color:var(--navy4);padding:8px 0">All caught up! No pending tasks.</div>';
 }
 
 function renderDashEMI() {
@@ -2818,27 +2893,21 @@ async function analyzeRadar() {
 // ══════════════════════════
 // TASKS ENGINE
 // ══════════════════════════
+function taskBadgeColor(prio) {
+  return prio==='critical'?'red':prio==='strategic'?'amber':'navy';
+}
+
 function renderAllTasks() {
   const cats = { critical:[], strategic:[], routine:[] };
-  STATE.tasks.forEach(t => {
-    if(cats[t.prio]) cats[t.prio].push(t);
-  });
+  STATE.tasks.forEach(t => { if(cats[t.prio]) cats[t.prio].push(t); });
   ['critical','strategic','routine'].forEach(cat => {
     const el = document.getElementById('tasks-'+cat);
     if(!el) return;
-    if(!cats[cat].length) { el.innerHTML = '<div style="font-size:13px;color:var(--navy4);padding:8px 0">No tasks in this category</div>'; return; }
-    el.innerHTML = cats[cat].map(t=>`
-      <div class="task-row ${t.done?'done':''}">
-        <div class="task-check ${t.done?'checked':''}" onclick="toggleTaskId(${t.id})">${t.done?'✓':''}</div>
-        <div class="task-body">
-          <div class="task-title ${t.done?'strikethrough':''}">${t.title}</div>
-          <div class="task-meta">
-            <span class="badge badge-${cat==='critical'?'red':cat==='strategic'?'amber':'navy'}">${cat}</span>
-            <span class="task-due ${isDue(t.due)?'red':''}">${isDue(t.due)?'⚠ OVERDUE':'Due'}: ${formatDate(t.due)}</span>
-            <span class="badge badge-navy">${t.type}</span>
-          </div>
-        </div>
-      </div>`).join('');
+    if(!cats[cat].length) {
+      el.innerHTML = '<div style="font-size:13px;color:var(--navy4);padding:8px 0">No tasks in this category</div>';
+      return;
+    }
+    el.innerHTML = cats[cat].map(t => taskRowHTML(t, true)).join('');
   });
   const cc = document.getElementById('criticalCount');
   const sc = document.getElementById('strategicCount');
@@ -2846,31 +2915,73 @@ function renderAllTasks() {
   if(sc) sc.textContent = cats.strategic.filter(t=>!t.done).length;
 }
 
+function taskRowHTML(t, showDelete) {
+  const overdue = isDue(t.due) && !t.done;
+  return `<div class="task-row ${t.done?'done':''}" id="trow-${t.id}">
+    <div class="task-check ${t.done?'checked':''}" onclick="toggleTaskId(${t.id})">${t.done?'✓':''}</div>
+    <div class="task-body">
+      <div class="task-title ${t.done?'strikethrough':''}">${escHtml(t.title)}</div>
+      <div class="task-meta">
+        <span class="badge badge-${taskBadgeColor(t.prio)}">${t.prio}</span>
+        <span class="task-due ${overdue?'red':''}">${overdue?'⚠ Overdue':'Due'}: ${formatDate(t.due)}</span>
+        <span class="badge badge-navy">${t.type}</span>
+      </div>
+    </div>
+    ${showDelete?`<div style="margin-left:auto;padding-left:8px;flex-shrink:0;">
+      <span onclick="deleteTask(${t.id})" title="Delete" style="cursor:pointer;color:var(--navy4);font-size:16px;line-height:1;padding:4px 6px;border-radius:4px;display:inline-block;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--navy4)'">×</span>
+    </div>`:''}
+  </div>`;
+}
+
 function toggleTaskId(id) {
   const t = STATE.tasks.find(x=>x.id===id);
-  if(t) { t.done = !t.done; renderAllTasks(); renderDashTasks(); }
+  if(!t) return;
+  t.done = !t.done;
+  savePersist();
+  // Re-render only active view to avoid double renders
+  const tasksView = document.getElementById('view-tasks');
+  if(tasksView && tasksView.classList.contains('active')) renderAllTasks();
+  renderDashTasks();
+}
+
+function deleteTask(id) {
+  STATE.tasks = STATE.tasks.filter(t=>t.id!==id);
+  savePersist();
+  const tasksView = document.getElementById('view-tasks');
+  if(tasksView && tasksView.classList.contains('active')) renderAllTasks();
+  renderDashTasks();
 }
 
 function addQuickTask() {
-  const name = document.getElementById('qt-name').value.trim();
-  if(!name) return;
+  const nameEl = document.getElementById('qt-name');
+  const name = (nameEl.value || '').trim();
+  if(!name) { nameEl.style.border='1.5px solid var(--red)'; return; }
+  nameEl.style.border='';
   const date = document.getElementById('qt-date').value || new Date(Date.now()+7*86400000).toISOString().split('T')[0];
   let prio = document.getElementById('qt-prio').value;
   if(prio==='ai') prio = 'strategic';
   STATE.tasks.unshift({ id:Date.now(), title:name, due:date, prio, done:false, type:'Task' });
-  document.getElementById('qt-name').value = '';
+  savePersist();
+  nameEl.value = '';
+  document.getElementById('qt-date').value = '';
   renderAllTasks();
   renderDashTasks();
 }
 
 function addTaskFromModal() {
-  const name = document.getElementById('mt-name').value.trim();
-  if(!name) return;
+  const nameEl = document.getElementById('mt-name');
+  const name = (nameEl.value || '').trim();
+  if(!name) { nameEl.style.border='1.5px solid var(--red)'; return; }
   const date = document.getElementById('mt-date').value || new Date(Date.now()+7*86400000).toISOString().split('T')[0];
   let prio = document.getElementById('mt-prio').value;
   if(prio==='ai') prio='strategic';
-  STATE.tasks.unshift({ id:Date.now(), title:name, due:date, prio:prio.replace('🔴 ','').replace('🟡 ','').replace('🟢 ',''), done:false, type:document.getElementById('mt-type').value });
+  prio = prio.replace(/[🔴🟡🟢] /,'');
+  STATE.tasks.unshift({ id:Date.now(), title:name, due:date, prio, done:false, type:document.getElementById('mt-type').value });
+  savePersist();
   closeModal('taskModal');
+  // Reset form
+  nameEl.value=''; document.getElementById('mt-date').value=''; document.getElementById('mt-notes').value='';
+  nameEl.style.border='';
   renderAllTasks();
   renderDashTasks();
 }
@@ -2936,21 +3047,48 @@ function renderGoalsList() {
   const el = document.getElementById('goalsList');
   if(!el) return;
   const colorMap = { 'at-risk':'red', 'on-track':'green', 'behind':'amber' };
-  el.innerHTML = STATE.goals.map(g=>`
-    <div style="margin-bottom:14px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;" onclick="askLIAAboutGoal(${g.id})">
+  if(!STATE.goals.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--navy4);padding:12px 0">No active goals. Define one using the form ←</div>';
+    return;
+  }
+  el.innerHTML = STATE.goals.map(g => `
+    <div style="margin-bottom:14px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
-        <div>
-          <div style="font-size:14px;font-weight:700">${g.title}</div>
-          <div style="font-size:12px;color:var(--navy4);margin-top:2px">${g.category} · Due ${g.deadline}</div>
+        <div style="cursor:pointer;flex:1;" onclick="askLIAAboutGoal(${g.id})">
+          <div style="font-size:14px;font-weight:700">${escHtml(g.title)}</div>
+          <div style="font-size:12px;color:var(--navy4);margin-top:2px">${g.category} · Due ${g.deadline||'–'}</div>
         </div>
-        <span class="badge badge-${colorMap[g.status]||'navy'}">${g.status.replace('-',' ')}</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <span class="badge badge-${colorMap[g.status]||'navy'}">${g.status.replace('-',' ')}</span>
+          <span onclick="deleteGoal(${g.id})" title="Delete" style="cursor:pointer;color:var(--navy4);font-size:18px;line-height:1;padding:2px 5px;border-radius:4px;" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--navy4)'">×</span>
+        </div>
       </div>
       <div class="prog-track"><div class="prog-fill prog-${colorMap[g.status]==='red'?'amber':'green'}" style="width:${g.progress}%"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
         <span style="font-size:12px;color:var(--navy4)">Progress</span>
-        <span class="font-mono text-sm">${g.progress}%</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="range" min="0" max="100" value="${g.progress}" style="width:80px;accent-color:var(--green);"
+            oninput="updateGoalProgress(${g.id},this.value)" title="Update progress">
+          <span class="font-mono text-sm" id="gpct-${g.id}">${g.progress}%</span>
+        </div>
       </div>
     </div>`).join('');
+}
+
+function updateGoalProgress(id, val) {
+  const g = STATE.goals.find(x=>x.id===id);
+  if(!g) return;
+  g.progress = parseInt(val);
+  g.status = g.progress>=80?'on-track':g.progress>=40?'on-track':'at-risk';
+  const el = document.getElementById('gpct-'+id);
+  if(el) el.textContent = val+'%';
+  savePersist();
+}
+
+function deleteGoal(id) {
+  STATE.goals = STATE.goals.filter(g=>g.id!==id);
+  savePersist();
+  renderGoalsList();
 }
 
 async function decomposeGoal() {
@@ -2991,8 +3129,10 @@ async function decomposeGoal() {
     );
     showAIModal('Goal Execution Roadmap: '+input, r);
 
-    // Also add to active goals
-    STATE.goals.push({ id:Date.now(), title:input, category:cat, progress:0, deadline:date||'2025-12-31', status:'on-track' });
+    // Also add to active goals and persist
+    const newGoal = { id:Date.now(), title:input, category:cat, progress:0, deadline:date||'', status:'on-track' };
+    STATE.goals.push(newGoal);
+    savePersist();
     renderGoalsList();
     document.getElementById('goalRoadmapCard').style.display = 'block';
     document.getElementById('goalInsightText').innerHTML = fmt(r.split('\n').slice(0,3).join('\n'));
@@ -3002,10 +3142,14 @@ async function decomposeGoal() {
 }
 
 async function createGoalAI() {
-  document.getElementById('goal-input').value = document.getElementById('mg-title').value;
+  const title = document.getElementById('mg-title').value.trim();
+  if(!title) { document.getElementById('mg-title').style.border='1.5px solid var(--red)'; return; }
+  document.getElementById('goal-input').value = title;
   document.getElementById('goal-cat').value = document.getElementById('mg-cat').value;
   document.getElementById('goal-date').value = document.getElementById('mg-date').value;
   document.getElementById('goal-context').value = document.getElementById('mg-context').value;
+  // Reset modal
+  ['mg-title','mg-context'].forEach(id => { const el=document.getElementById(id); if(el){el.value='';el.style.border='';} });
   closeModal('goalModal');
   goTo('goals', null);
   setTimeout(decomposeGoal, 300);
@@ -3554,6 +3698,26 @@ function addMsgUI(role, text) {
   return div;
 }
 
+// ── Safe math evaluator (no eval, no security risk)
+function tryMath(expr) {
+  const clean = expr.replace(/\s/g,'');
+  // Only allow digits, operators + - * / % ( ) and decimal
+  if(!/^[\d+\-*/.%()\s]+$/.test(clean)) return null;
+  // Disallow consecutive operators or other exploits
+  if(/[+\-*/%]{2,}/.test(clean)) return null;
+  try {
+    // Use Function constructor scoped — no access to globals
+    const result = Function('"use strict"; return (' + clean + ')')();
+    if(typeof result !== 'number' || !isFinite(result)) return null;
+    return Math.round(result*10000)/10000;
+  } catch(e) { return null; }
+}
+
+// ── Detect if message looks like a greeting
+function isGreeting(msg) {
+  return /^(hi|hello|hey|hii|hlo|howdy|sup|yo|good\s*(morning|evening|afternoon|night)|namaste|greetings)[\s!?.,]*$/i.test(msg.trim());
+}
+
 async function sendMsg() {
   const inp = document.getElementById('chatInput');
   const msg = inp.value.trim();
@@ -3561,6 +3725,26 @@ async function sendMsg() {
   inp.value = '';
   addMsgUI('user', msg);
   chatMsgHistory.push({ role:'user', content:msg });
+
+  // ── Math shortcut (no API needed)
+  const mathResult = tryMath(msg);
+  if(mathResult !== null) {
+    const reply = `${msg} = <strong>${mathResult.toLocaleString()}</strong>`;
+    const el = addMsgUI('lia', reply);
+    chatMsgHistory.push({ role:'assistant', content: msg + ' = ' + mathResult });
+    return;
+  }
+
+  // ── Greeting shortcut (no API needed)
+  if(isGreeting(msg)) {
+    const fn = userFirstName();
+    const h = new Date().getHours();
+    const tod = h<12?'morning':h<17?'afternoon':'evening';
+    const reply = `Good ${tod}, ${fn}! 👋 I'm tracking <strong>${STATE.tasks.filter(t=>!t.done&&t.prio==='critical').length} critical tasks</strong> and <strong>${STATE.goals.length} active goals</strong> for you. What would you like to work on?`;
+    addMsgUI('lia', reply);
+    chatMsgHistory.push({ role:'assistant', content: reply });
+    return;
+  }
 
   const typingEl = addMsgUI('lia', '<span class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></span>');
 
@@ -3570,9 +3754,9 @@ async function sendMsg() {
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:SYSTEM_PROMPT,
-        messages:chatMsgHistory.slice(-10)
+        max_tokens:600,
+        system: getSystemPrompt(),
+        messages: chatMsgHistory.slice(-10)
       })
     });
     const d = await res.json();
@@ -3580,14 +3764,27 @@ async function sendMsg() {
     typingEl.querySelector('.msg-bubble').innerHTML = fmt(reply);
     chatMsgHistory.push({ role:'assistant', content:reply });
   } catch(e) {
-    // Intelligent fallbacks
+    // Smart offline fallbacks keyed to user's actual data
     const lower = msg.toLowerCase();
-    let fb = 'Based on your profile: your most urgent action is paying the overdue electricity bill (₹1,840), then focusing on AWS Module 4 due March 10.';
-    if(lower.includes('emi')||lower.includes('loan')) fb = 'Your Personal Loan at 12.5% is the most expensive debt. Paying ₹6,500 extra/month closes it 58 months early and saves ₹38,400 in interest. Start here before any home loan prepayment.';
-    else if(lower.includes('budget')||lower.includes('spend')||lower.includes('money')) fb = 'Your variable expenses are ₹6,400 above target. Food & dining is the primary leakage point at ₹12,400 vs ₹8,000 budget. Cutting this single category improves your savings rate from 20.7% to 25.9%.';
-    else if(lower.includes('goal')||lower.includes('aws')||lower.includes('certif')) fb = 'AWS certification is at 40% with 48 days remaining. You need to complete 1.5 modules/week. At your current pace of 0.8/week, you\'ll finish 3 weeks late. Increase daily study from 45min to 90min to recover.';
-    else if(lower.includes('score')||lower.includes('life')) fb = 'Your Life Score of 74 is held back by: Finance (68) and Organization (62). The fastest path to 85+ is: (1) Upload 6 missing documents (+4 pts), (2) Set food budget at ₹8K (+3 pts), (3) Complete AWS cert (+3 pts).';
-    else if(lower.includes('invest')||lower.includes('save')) fb = 'After covering your ₹1.4L emergency fund shortfall, the optimal sequence is: (1) Extra ₹3K/mo to SBI personal loan, (2) Rest to liquid mutual fund. Your target is 6-month emergency coverage (₹4L) — at current ₹17.6K savings, you reach it in 14 months without changes, or 9 months if personal loan is cleared.';
+    const fn = userFirstName();
+    let fb;
+    if(lower.includes('emi')||lower.includes('loan')) {
+      fb = `${fn}, your Personal Loan at 12.5% is your most expensive debt. Paying ₹6,500 extra/month closes it 58 months early and saves ₹38,400 in interest. Tackle this before home loan prepayment.`;
+    } else if(lower.includes('budget')||lower.includes('spend')||lower.includes('expense')) {
+      fb = `Variable expenses are ₹6,400 above target. Food & dining is the primary leak at ₹12,400 vs ₹8,000 budget. Fixing this alone improves savings rate from 20.7% → 25.9%.`;
+    } else if(lower.includes('goal')||lower.includes('aws')||lower.includes('cert')) {
+      fb = `AWS cert is at 40% with deadline approaching. You need 1.5 modules/week. At 0.8/week current pace, you finish 3 weeks late. Increase daily study from 45min → 90min to recover.`;
+    } else if(lower.includes('score')||lower.includes('life')) {
+      fb = `Life Score 74 is held back by Finance (68) and Organization (62). Fastest path to 85+: upload 6 missing docs (+4 pts), cap food at ₹8K (+3 pts), complete AWS cert (+3 pts).`;
+    } else if(lower.includes('invest')||lower.includes('save')) {
+      fb = `Optimal sequence: (1) Extra ₹3K/mo to SBI personal loan, (2) remainder to liquid mutual fund. Emergency fund target ₹4L — reachable in 9 months after personal loan clears.`;
+    } else if(lower.includes('burnout')||lower.includes('stress')||lower.includes('tired')) {
+      fb = `Burnout risk is 42% (Moderate). Primary driver: financial cognitive load, not task count. Set up EMI auto-pay this week — removes 7 recurring mental tasks and drops risk to ~28%.`;
+    } else if(lower.includes('productivity')||lower.includes('focus')||lower.includes('today')) {
+      fb = `Top priority today: (1) Pay overdue electricity bill — 15 min. (2) AWS Module 4 study — 90 min block. (3) Confirm HDFC EMI auto-debit. Defer LinkedIn update and reading to tomorrow.`;
+    } else {
+      fb = `Based on your current profile: ${STATE.tasks.filter(t=>!t.done&&t.prio==='critical').length} critical tasks pending, Life Score at 74/100, and AWS cert at risk. What specific area do you want to optimize first?`;
+    }
     typingEl.querySelector('.msg-bubble').innerHTML = fb;
     chatMsgHistory.push({ role:'assistant', content:fb });
   }
@@ -3653,7 +3850,7 @@ async function runFocusBriefing() {
   openAIModal('Today\'s Focus Briefing — LIA');
   try {
     const r = await callLIA(
-      `Give Aditya a precise "What to focus on today" briefing. 
+      `Give ${userFirstName()} a precise "What to focus on today" briefing. 
       Format:
       TOP PRIORITY (Do first): [specific task + why it's #1 today]
       SECOND PRIORITY: [task + time estimate]
@@ -3707,30 +3904,29 @@ function formatDate(dateStr) {
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
 }
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 // ══════════════════════════
 // INITIAL SETUP
 // ══════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  // Initialize progress bars animation
-  setTimeout(() => {
-    document.querySelectorAll('.prog-fill[data-w]').forEach(f => {
-      f.style.width = f.dataset.w;
-    });
-  }, 300);
-
-  // Dashboard init
-  initDashboard();
-});
-
-// Animate life score on page load
-setTimeout(() => {
-  const arc = document.getElementById('lifeScoreArc');
-  if(arc) {
-    const circ = 2*Math.PI*76;
-    arc.style.strokeDasharray = `${(74/100)*circ} ${circ}`;
+  // If name not stored → show overlay, don't init dashboard yet
+  if(!STATE.user.name) {
+    document.getElementById('nameOverlay').classList.add('open');
+    setTimeout(()=>{ const ni=document.getElementById('nameInput'); if(ni) ni.focus(); }, 100);
+    return;
   }
-}, 500);
+  // Name exists — boot normally
+  applyUserName();
+  initDashboard();
+  // Animate life score arc on dashboard load
+  setTimeout(() => {
+    const arc = document.getElementById('lifeScoreArc');
+    if(arc) { const c=2*Math.PI*76; arc.style.strokeDasharray=`${(74/100)*c} ${c}`; }
+  }, 500);
+});
 
 </script>
 </body>
